@@ -1,11 +1,14 @@
-// src/App.jsx
-import Form from "./components/Form.jsx";
+import { Routes, Route } from "react-router-dom";
+import Form from "./components/Form";
+import RecuperarSenha from "./components/RecuperarSenha";
 
 function App() {
   return (
-    <div className="flex w-full h-screen bg-gray-100 items-center justify-center">
-      <Form />
-    </div>
+    <Routes>
+      <Route path="/" element={<Form />} />
+      <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
+      <Route path="*" element={<Form />} />
+    </Routes>
   );
 }
 
