@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginService } from '../../services/AuthService';
 import { ToastContainer, toast } from 'react-toastify';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const navigate = useNavigate();
 
   async function onSubmitLogin() {
     const loginResponse = await loginService(email, senha);
@@ -16,6 +17,21 @@ function Login() {
       });
       return;
     }
+
+    // loginResponse.user.user_type deve retornar 'aluno', 'professor' ou 'coordenador'
+    const tipo = loginResponse.user?.user_type;
+
+    if (tipo === 'aluno') {
+      navigate('/aluno');
+    } else if (tipo === 'professor') {
+      navigate('/professor');
+    } else if (tipo === 'coordenador') {
+      navigate('/coordenador');
+    } else {
+      toast('Tipo de usuário desconhecido.', { type: 'error' });
+      return;
+    }
+
     toast('Login realizado com sucesso!', {
       type: 'success',
     });
