@@ -13,7 +13,7 @@ const nome = localStorage.getItem("nome") || "Aluno";
         </div>
         <div className="w-[150vh] mx-auto my-8 px-8 py-4 bg-white rounded-lg shadow">
           <h2 className="text-xl font-bold text-[#2F9E41] mb-2">
-            Bom dia, {nome}
+            Bem vindo(a), {nome}
           </h2>
           <p className="text-gray-700">
             Seu cadastro já foi realizado e você já está na lista de espera por orientação, aguarde novas informações sobre pesquisa, temas, desenvolvimento, prazos e professores orientadores disponíveis na sua área de pesquisa. Caso ainda não possua uma área, você receberá instruções e sugestões pelo coordenador do curso ou algum professor disponível assim que possível. A paciência é uma virtude!
