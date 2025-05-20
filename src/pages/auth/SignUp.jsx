@@ -91,11 +91,10 @@ function Cadastro() {
               required
             />
 
-            <ul className="text-xs text-gray-600 grid grid-cols-2 gap-x-4 ml-5 list-disc">
+            <ul className="text-xs text-gray-600 grid grid-cols-3 gap-x-4 ml-5 list-disc">
               <li>Mínimo de 8 caracteres</li>
               <li>Uma letra minúscula</li>
               <li>Um número</li>
-              <li>Um caractere especial</li>
               </ul>
           </div>
 
