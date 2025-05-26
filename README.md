@@ -92,4 +92,4 @@ O projeto esta aberto à contribuições, se você tem ideias de como melhorar n
 
 ## 📝 Licença
 
-Esse projeto está sob licença. Veja o arquivo [LICENÇA](LICENSE.md) para mais detalhes.
+Esse projeto está sob licença. Veja o arquivo [LICENÇA](LICENSE) para mais detalhes.
