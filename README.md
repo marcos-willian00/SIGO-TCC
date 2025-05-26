@@ -23,7 +23,7 @@ O SIGO-TCC (Sistema Integrado de Gestão e Orientação de TCC) visa facilitar a
 
 ## ▶️ Execução do SIGO-TCC
 
-### 1. Pré-requisitos
+### Pré-requisitos
 
 Antes de começar, verifique se você atendeu aos seguintes requisitos:
 
