@@ -2,18 +2,17 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
+
 function Cadastro() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    nome: '',
-    nomeSocial: '',
+    full_name: '',
+    username: '',
     email: '',
-    telefone: '',
     matricula: '',
-    senha: '',
-    confirmaSenha: '',
-    tipoUsuario: 'Professor Orientador',
+    user_type: '',
+    password: '',
   });
 
   const handleChange = (e) => {
@@ -24,23 +23,56 @@ function Cadastro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (form.senha !== form.confirmaSenha) {
-      toast.error('As senhas não coincidem.');
-      return;
+    // user_type já está em MAIÚSCULO pelo select
+    console.log("Dados do cadastro:", {
+      email: form.email,
+      username: form.username,
+      full_name: form.full_name,
+      matricula: form.matricula,
+      user_type: form.user_type,
+      password: form.password,
+    });
+
+    try {
+      const response = await fetch('http://localhost:8000/users/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: form.email,
+          username: form.username,
+          full_name: form.full_name,
+          matricula: form.matricula,
+          user_type: form.user_type,
+          password: form.password,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Cadastro realizado com sucesso!');
+        if (form.user_type === 'ALUNO') {
+          navigate('/aluno');
+        } else if (form.user_type === 'PROFESSOR') {
+          navigate('/professor');
+        } else if (form.user_type === 'COORDENADOR') {
+          navigate('/coordenador');
+        } else {
+          navigate('/login');
+        }
+      } else {
+        const data = await response.json();
+        toast.error(data.detail || 'Erro ao cadastrar usuário.');
+      }
+    } catch (error) {
+      toast.error('Erro ao conectar com o servidor.');
+      console.error(error);
     }
-
-    // Aqui você pode fazer a requisição para o backend
-    // Exemplo:
-    // const response = await cadastroService(form);
-    // if (response.ok) navigate('/login');
-
-    toast.success('Cadastro realizado com sucesso!');
-    navigate('/login');
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-5xl">
+      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-3xl">
         <h2 className="text-2xl font-bold text-center text-[#2F9E41]">Cadastro</h2>
         <div className="h-1 bg-[#2F9E41] w-24 mx-auto my-1 rounded-full"></div>
 
@@ -50,9 +82,20 @@ function Cadastro() {
             <label className="block font-bold mb-1">Nome Completo</label>
             <input
               type="text"
-              name="nome"
-              placeholder="Nome"
-              value={form.nome}
+              name="full_name"
+              placeholder="Nome Completo"
+              value={form.full_name}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
+              required
+            />
+
+            <label className="block font-bold mb-1">Usuário</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Usuário"
+              value={form.username}
               onChange={handleChange}
               className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
               required
@@ -79,66 +122,30 @@ function Cadastro() {
               className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
               required
             />
-
-            <label className="block font-bold mb-1">Senha</label>
-            <input
-              type="password"
-              name="senha"
-              placeholder="Senha"
-              value={form.senha}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
-              required
-            />
-
-            <ul className="text-xs text-gray-600 grid grid-cols-3 gap-x-4 ml-5 list-disc">
-              <li>Mínimo de 8 caracteres</li>
-              <li>Uma letra minúscula</li>
-              <li>Um número</li>
-              </ul>
           </div>
 
           {/* Coluna Direita */}
           <div>
-            <label className="block font-bold mb-1">Nome Social (Opcional)</label>
-            <input
-              type="text"
-              name="nomeSocial"
-              placeholder="Nome Social"
-              value={form.nomeSocial}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
-            />
-
-            <label className="block font-bold mb-1">Telefone</label>
-            <input
-              type="text"
-              name="telefone"
-              placeholder="Telefone"
-              value={form.telefone}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
-            />
-
             <label className="block font-bold mb-1">Tipo de usuário</label>
             <select
-              name="tipoUsuario"
-              value={form.tipoUsuario}
+              name="user_type"
+              value={form.user_type}
               onChange={handleChange}
               className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
               required
             >
-              <option>Professor Orientador</option>
-              <option>Aluno</option>
-              <option>Coordenador</option>
+              <option value="" disabled>Selecione o tipo de usuário</option>
+              <option value="professor">Professor Orientador</option>
+              <option value="aluno">Aluno</option>
+              <option value="coordenador">Coordenador</option>
             </select>
 
-            <label className="block font-bold mb-1">Confirme a senha</label>
+            <label className="block font-bold mb-1">Senha</label>
             <input
               type="password"
-              name="confirmaSenha"
+              name="password"
               placeholder="Senha"
-              value={form.confirmaSenha}
+              value={form.password}
               onChange={handleChange}
               className="w-full p-3 border rounded-md mb-4 focus:border-[#2F9E41] border-gray-300 focus:outline-none"
               required
