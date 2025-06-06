@@ -21,16 +21,21 @@ function Login() {
     // loginResponse.user.user_type deve retornar 'aluno', 'professor' ou 'coordenador'
     const tipo = loginResponse.user?.user_type;
 
-    if (tipo === 'aluno') {
-      navigate('/aluno');
-    } else if (tipo === 'professor') {
-      navigate('/professor');
-    } else if (tipo === 'coordenador') {
-      navigate('/coordenador');
-    } else {
-      toast('Tipo de usuário desconhecido.', { type: 'error' });
-      return;
-    }
+    if (tipo === 'estudante') {
+  navigate('/aluno');
+} else if (tipo === 'professor') {
+  // Aqui você pode diferenciar admin/coordenador pelo campo user.role, se quiser
+  if (loginResponse.user.role === 'coordenador') {
+    navigate('/coordenador');
+  } else if (loginResponse.user.role === 'admin') {
+    navigate('/admin');
+  } else {
+    navigate('/professor');
+  }
+} else {
+  toast('Tipo de usuário desconhecido.', { type: 'error' });
+  return;
+}
 
     toast('Login realizado com sucesso!', {
       type: 'success',

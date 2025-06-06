@@ -28,9 +28,12 @@ export default function AlunoMenu() {
         <Link to="/aluno/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaUserTie /> Professores
         </Link>
-        <Link to="/aluno/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+        <button
+          className="flex items-center gap-2 w-full text-left py-2 px-4 hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold rounded transition"
+          onClick={() => navigate('/aluno/meu-perfil-aluno')}
+        >
           <FaUser /> Meu Perfil
-        </Link>
+        </button>
       </nav>
       <button
         onClick={handleLogout}

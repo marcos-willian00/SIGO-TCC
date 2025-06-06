@@ -1,13 +1,13 @@
 import httpClient from './api';
 
 export const loginService = async (email, password) => {
-  const formData = new FormData();
-  formData.append('username', email);
-  formData.append('password', password);
+  const params = new URLSearchParams();
+  params.append('username', email);
+  params.append('password', password);
 
-  const response = await httpClient.post('/token', formData, {
+  const response = await httpClient.post('/auth/login', params, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 
@@ -17,11 +17,19 @@ export const loginService = async (email, password) => {
   localStorage.setItem('token', access_token);
 
   // Buscar dados do usuário autenticado
-  const userResponse = await httpClient.get('/users/current_user');
+  const userResponse = await httpClient.get('/auth/me');
   const user = userResponse.data;
-console.log("Usuário retornado:", user);
-  // Salve o nome completo no localStorage
-  localStorage.setItem('nome', user.full_name);
+  console.log("Usuário retornado:", user);
+
+  // Checagem robusta:
+  if (!user || !user.id || !user.nome || !user.user_type) {
+    alert("Usuário desconhecido ou não autenticado.");
+    return false;
+  }
+
+  // Salve o nome e tipo no localStorage
+  localStorage.setItem('nome', user.nome);
+  localStorage.setItem('user_type', user.user_type);
 
   return { user };
 };
