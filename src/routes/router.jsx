@@ -9,6 +9,7 @@ import MainpageProfessor from '../pages/professor/MainpageProfessor';
 import MainpageCoordenador from '../pages/coordenador/MainpageCoordenador';
 import MeuPerfilAluno from '../pages/aluno/meu-perfil-aluno';
 import AdminDashboard from '../pages/admin/admin-dashboard';
+import CursosAdmin from '../pages/admin/cursos-admin';
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/professor" element={<MainpageProfessor />} />
       <Route path="/coordenador" element={<MainpageCoordenador />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/cursos-admin" element={<CursosAdmin />} />
       
       <Route path="*" element={<Login />} />
     </Routes>

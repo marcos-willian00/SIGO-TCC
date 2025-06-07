@@ -26,10 +26,7 @@ export default function AdminMenu() {
           <Link to="/admin/usuarios" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaUsers /> Gerenciar Usuários
           </Link>
-          <Link to="/admin/professores" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-            <FaChalkboardTeacher /> Professores
-          </Link>
-          <Link to="/admin/cursos" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+          <Link to="/admin/cursos-admin" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaBook /> Cursos
           </Link>
           <Link to="/admin/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
