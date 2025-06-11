@@ -25,9 +25,9 @@ export default function CoordenadorMenu() {
         <Link to="/coordenador/alunos" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaUsers /> Alunos
         </Link>
-        <Link to="/coordenador/professores" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-          <FaChalkboardTeacher /> Professores
-        </Link>
+        <Link to="/coordenador/professores-departamento" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+  <FaChalkboardTeacher /> Professores
+</Link>
         <Link to="/coordenador/mensagens" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaEnvelope /> Mensagens
         </Link>
@@ -37,7 +37,10 @@ export default function CoordenadorMenu() {
         <Link to="/coordenador/configuracoes" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaCog /> Configurações
         </Link>
-        <Link to="/coordenador/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+        <Link
+          to="/coordenador/meu-perfil-coordenador"
+          className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition"
+        >
           <FaUser /> Meu Perfil
         </Link>
       </nav>
