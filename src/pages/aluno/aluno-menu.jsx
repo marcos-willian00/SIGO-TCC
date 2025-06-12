@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaFileAlt, FaUserTie, FaUser } from "react-icons/fa";
+import { FaHome, FaFileAlt, FaUserTie, FaUser, FaTasks } from "react-icons/fa";
 
 export default function AlunoMenu() {
   const navigate = useNavigate();
@@ -27,6 +27,9 @@ export default function AlunoMenu() {
         </Link>
         <Link to="/aluno/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaUserTie /> Professores
+        </Link>
+        <Link to="/aluno/tarefas-aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+          <FaTasks /> Tarefas
         </Link>
         <button
           className="flex items-center gap-2 w-full text-left py-2 px-4 hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold rounded transition"
