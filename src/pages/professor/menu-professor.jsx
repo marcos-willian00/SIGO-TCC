@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaFileAlt, FaEnvelope, FaUsers, FaCog, FaUser } from "react-icons/fa";
+import { FaHome, FaFileAlt, FaEnvelope, FaUsers, FaCog, FaUser, FaTasks } from "react-icons/fa";
 
 export default function ProfessorMenu() {
   const navigate = useNavigate();
@@ -28,15 +28,18 @@ export default function ProfessorMenu() {
         <Link to="/professor/mensagens" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaEnvelope /> Mensagens
         </Link>
-        <Link to="/professor/orientandos-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-  <FaUsers /> Orientandos
-</Link>
+        <Link to="/professor/orientados-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+          <FaUsers /> Orientandos
+        </Link>
+        <Link to="/professor/tarefas-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+          <FaTasks /> Tarefas
+        </Link>
         <Link to="/professor/configuracoes" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaCog /> Configurações
         </Link>
         <Link to="/professor/meu-perfil-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-  <FaUser /> Meu Perfil
-</Link>
+          <FaUser /> Meu Perfil
+        </Link>
       </nav>
       <button
         onClick={handleLogout}

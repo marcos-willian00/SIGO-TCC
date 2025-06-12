@@ -14,6 +14,8 @@ import MeuPerfilCoordenador from '../pages/coordenador/meu-perfil-coordenador';
 import MeuPerfilProfessor from '../pages/professor/meu-perfil-professor';
 import ProfessoresDepartamento from '../pages/coordenador/professores-departamento';
 import OrientandosProfessor from '../pages/professor/orientados-professor';
+import TarefasProfessor from '../pages/professor/tarefas-professor';
+
 
 
 function Router() {
@@ -34,6 +36,7 @@ function Router() {
       <Route path="/professor/meu-perfil-professor" element={<MeuPerfilProfessor />} />
       <Route path="/coordenador/professores-departamento" element={<ProfessoresDepartamento />} />
       <Route path="/professor/orientados-professor" element={<OrientandosProfessor />} />
+      <Route path="/professor/tarefas-professor" element={<TarefasProfessor />} />
       <Route path="*" element={<Login />} />
     </Routes>
   );  
