@@ -1,36 +1,42 @@
-import AlunoMenu from "../../pages/aluno/aluno-menu";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import AlunoMenu from "./aluno-menu";
 
 export default function MainpageAluno() {
-  // Pegue o nome do aluno do localStorage (ajuste a chave se necessário)
-const nome = localStorage.getItem("nome") || "Aluno";
+  const navigate = useNavigate();
+  const nome = localStorage.getItem("nome") || "Aluno";
+
+  useEffect(() => {
+    async function checkTcc() {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8000/students/me/tccs", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const tccs = await response.json();
+        if (tccs && tccs.length > 0) {
+          navigate("/aluno/mainpage-aluno-orientando");
+        }
+      }
+    }
+    checkTcc();
+  }, [navigate]);
 
   return (
     <>
       <AlunoMenu />
-      <div className="ml-64 bg-gray-100">
+      <div className="ml-64 bg-gray-100 min-h-screen">
         <div className="px-6 py-2 bg-gray-100">
-          <h1 className="text-2xl font-bold text-[#374957]">Início</h1>
+          <h1 className="text-2xl font-bold text-[#374957]">Área do Aluno</h1>
         </div>
         <div className="w-[150vh] mx-auto my-8 px-8 py-4 bg-white rounded-lg shadow">
           <h2 className="text-xl font-bold text-[#2F9E41] mb-2">
             Bem vindo(a), {nome}
           </h2>
           <p className="text-gray-700">
-            Seu cadastro já foi realizado e você já está na lista de espera por orientação, aguarde novas informações sobre pesquisa, temas, desenvolvimento, prazos e professores orientadores disponíveis na sua área de pesquisa. Caso ainda não possua uma área, você receberá instruções e sugestões pelo coordenador do curso ou algum professor disponível assim que possível. A paciência é uma virtude!
+            Você ainda não possui orientador. Aguarde um convite ou procure um professor para iniciar seu TCC.
           </p>
         </div>
-        {/* Imagem abaixo da div do bom dia aluno */}
-        <div className="px-8 py-8 bg-gray-100 flex flex-col items-center">
-          <img
-            src="/Asset 1 1.svg" // Altere para o caminho da imagem desejada
-            alt="Imagem do aluno"
-            className="w-100 h-auto mx-auto"
-          />
-          
-        </div>
-        <h3 className="mt-6 px-8 py-8 text-2xl font-bold text-[#374957] text-center">
-          Aguarde Orientação!
-        </h3>
       </div>
     </>
   );

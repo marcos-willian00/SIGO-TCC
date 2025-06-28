@@ -99,10 +99,10 @@ export default function CursosAdmin() {
     }
     try {
         await httpClient.put(`/admin/cursos/${cursoSelecionado.id_curso}/assign-coordenador/${professorId}`);
-        toast.success("Coordenador atribuído com sucesso!"); // Toast de sucesso
+        await fetchCursos(); // Aguarda atualizar os cursos antes de fechar o modal e mostrar o toast
         setShowAssignModal(false);
         setCursoSelecionado(null);
-        fetchCursos();
+        toast.success("Coordenador atribuído com sucesso!");
     } catch (err) {
         toast.error(err?.response?.data?.detail || "Erro ao atribuir coordenador.");
     }

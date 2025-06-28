@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaHome, FaFileAlt, FaUserTie, FaUser, FaTasks } from "react-icons/fa";
 
-export default function AlunoMenu() {
+export default function AlunoMenuOrientando() {
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -19,20 +19,17 @@ export default function AlunoMenu() {
         />
       </div>
       <nav className="flex-1 flex flex-col gap-2 p-4">
-        <Link to="/aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+        <Link to="/aluno/orientando" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaHome /> Início
+        </Link>
+        <Link to="/aluno/tarefas-aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+          <FaTasks /> Tarefas
         </Link>
         <Link to="/aluno/atividades" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaFileAlt /> Documentação
         </Link>
-        <Link to="/aluno/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-          <FaUserTie /> Professores
-        </Link>
-        <Link to="/aluno/convites-aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-  <FaUserTie /> Convites de Orientação
-        </Link>
-        <Link to="/aluno/tarefas-aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-          <FaTasks /> Tarefas
+        <Link to="/aluno/orientador" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+          <FaUserTie /> Meu Orientador
         </Link>
         <button
           className="flex items-center gap-2 w-full text-left py-2 px-4 hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold rounded transition"

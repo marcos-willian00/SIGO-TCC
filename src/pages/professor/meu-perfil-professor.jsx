@@ -12,10 +12,8 @@ function MeuPerfilProfessor() {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch("http://localhost:8000/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  headers: { Authorization: `Bearer ${token}` }
+})
         if (response.ok) {
           const data = await response.json();
           setUser(data);

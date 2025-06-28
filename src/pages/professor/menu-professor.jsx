@@ -10,7 +10,7 @@ export default function ProfessorMenu() {
   }
 
   return (
-    <aside className="h-screen w-64 bg-[#FFFFFF] text-[#444444] font-bold flex flex-col fixed left-0 top-0 shadow-lg">
+    <aside className="h-screen w-64 bg-[#FFFFFF] text-[#444444] font-bold flex flex-col fixed left-0 top-0 shadow-lg z-30">
       <div className="p-6 flex justify-center">
         <img
           src="/logoSigoTCC.svg"
