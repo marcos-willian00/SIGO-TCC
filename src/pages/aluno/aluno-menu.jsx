@@ -25,7 +25,7 @@ export default function AlunoMenu() {
         <Link to="/aluno/atividades" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaFileAlt /> Documentação
         </Link>
-        <Link to="/aluno/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+        <Link to="/aluno/professores-aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaUserTie /> Professores
         </Link>
         <Link to="/aluno/convites-aluno" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">

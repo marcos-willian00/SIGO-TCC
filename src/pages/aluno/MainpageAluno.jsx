@@ -27,15 +27,27 @@ export default function MainpageAluno() {
       <AlunoMenu />
       <div className="ml-64 bg-gray-100 min-h-screen">
         <div className="px-6 py-2 bg-gray-100">
-          <h1 className="text-2xl font-bold text-[#374957]">Área do Aluno</h1>
+          <h1 className="text-2xl font-bold text-[#374957] ml-6 mt-8">
+            Área do Aluno
+          </h1>
         </div>
-        <div className="w-[150vh] mx-auto my-8 px-8 py-4 bg-white rounded-lg shadow">
+        <div className="w-full max-w-[1200px] mx-auto my-8 px-6 md:px-12 py-6 bg-white rounded-lg shadow">
           <h2 className="text-xl font-bold text-[#2F9E41] mb-2">
             Bem vindo(a), {nome}
           </h2>
+
           <p className="text-gray-700">
-            Você ainda não possui orientador. Aguarde um convite ou procure um professor para iniciar seu TCC.
+            Seu cadastro já foi realizado e você já está na lista de espera por orientação, seu cadastro foi concluído com sucesso 
+            e agora você está na lista de espera para receber o convite de um professor orientador. Aguarde o contato com informações 
+            sobre temas de pesquisa, prazos e orientadores disponíveis na sua área. Caso ainda não possua uma área, você receberá instruções 
+            e sugestões pelo seu coordenador de curso ou orientador assim que possível. A paciência é uma virtude!
           </p>
+
+          <img
+            src="./public/Asset 1 1.svg"
+            alt="Imagem de orientação acadêmica"
+            className="mx-auto mb-6 max-w-full h-auto"
+          />
         </div>
       </div>
     </>

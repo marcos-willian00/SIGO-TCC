@@ -17,6 +17,7 @@ import OrientandosProfessor from '../pages/professor/orientados-professor';
 import TarefasProfessor from '../pages/professor/tarefas-professor';
 import TarefasAluno from '../pages/aluno/tarefas-aluno';
 import ConvitesAluno from "../pages/aluno/convites-aluno";
+import TodosProfessores from '../pages/aluno/professores-aluno';
 import MainpageAlunoOrientando from "../pages/aluno/mainpage-aluno-orientando";
 
 
@@ -44,6 +45,7 @@ function Router() {
       <Route path="/professor/tarefas-professor" element={<TarefasProfessor />} />
       <Route path="/aluno/tarefas-aluno" element={<TarefasAluno />} />
       <Route path="/aluno/convites-aluno" element={<ConvitesAluno />} />
+      <Route path="/aluno/professores-aluno" element={<TodosProfessores />} />
       <Route path="/aluno/mainpage-aluno-orientando" element={<MainpageAlunoOrientando />} />
       <Route path="*" element={<Login />} />
     </Routes>
