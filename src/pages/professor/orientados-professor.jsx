@@ -121,6 +121,13 @@ export default function OrientandosProfessor() {
       <ProfessorMenu />
       <div className="flex-1 p-10 ml-64">
         <h1 className="text-2xl font-bold text-[#2F9E41] mb-6">Meus Orientandos</h1>
+        {/* Botão de convidar aluno logo abaixo do título */}
+        <button
+          onClick={handleAbrirConvite}
+          className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition mb-6"
+        >
+          Convidar Aluno
+        </button>
         <div className="bg-white rounded shadow p-6 mb-6">
           <table className="min-w-full text-left">
             <thead>
@@ -143,12 +150,6 @@ export default function OrientandosProfessor() {
             </tbody>
           </table>
         </div>
-        <button
-          onClick={handleAbrirConvite}
-          className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition mb-4"
-        >
-          Convidar Aluno
-        </button>
 
         {/* Modal de convite */}
         {showConvite && (
@@ -259,5 +260,5 @@ export default function OrientandosProfessor() {
         <ToastContainer />
       </div>
     </div>
-);
+  );
 }

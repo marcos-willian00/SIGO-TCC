@@ -93,20 +93,20 @@ export default function CursosAdmin() {
 
     // Atribuir coordenador
     async function handleAssignCoordenador(professorId) {
-    if (!cursoSelecionado) {
-        toast.error("Selecione um curso primeiro.");
-        return;
+        if (!cursoSelecionado) {
+            toast.error("Selecione um curso primeiro.");
+            return;
+        }
+        try {
+            await httpClient.put(`/admin/cursos/${cursoSelecionado.id_curso}/assign-coordenador/${professorId}`);
+            await fetchCursos();
+            setShowAssignModal(false);
+            setCursoSelecionado(null);
+            toast.success("Coordenador atribuído com sucesso!");
+        } catch (err) {
+            toast.error(err?.response?.data?.detail || "Erro ao atribuir coordenador.");
+        }
     }
-    try {
-        await httpClient.put(`/admin/cursos/${cursoSelecionado.id_curso}/assign-coordenador/${professorId}`);
-        await fetchCursos(); // Aguarda atualizar os cursos antes de fechar o modal e mostrar o toast
-        setShowAssignModal(false);
-        setCursoSelecionado(null);
-        toast.success("Coordenador atribuído com sucesso!");
-    } catch (err) {
-        toast.error(err?.response?.data?.detail || "Erro ao atribuir coordenador.");
-    }
-}
 
     return (
         <div className="flex min-h-screen bg-gray-100">
@@ -196,21 +196,21 @@ export default function CursosAdmin() {
                                         </tr>
                                     </thead>
                                     <tbody>
-    {professores.map(prof => (
-        <tr key={prof.id_professor ?? prof.id}>
-            <td className="py-2 px-4">{prof.nome}</td>
-            <td className="py-2 px-4">
-                <button
-                    className="bg-[#2F9E41] text-white px-4 py-1 rounded hover:bg-[#217a32] transition"
-                    onClick={() => handleAssignCoordenador(prof.id_professor ?? prof.id)}
-                    disabled={!cursoSelecionado}
-                >
-                    Atribuir
-                </button>
-            </td>
-        </tr>
-    ))}
-</tbody>
+                                        {professores.map(prof => (
+                                            <tr key={prof.id_professor ?? prof.id}>
+                                                <td className="py-2 px-4">{prof.nome}</td>
+                                                <td className="py-2 px-4">
+                                                    <button
+                                                        className="bg-[#2F9E41] text-white px-4 py-1 rounded hover:bg-[#217a32] transition"
+                                                        onClick={() => handleAssignCoordenador(prof.id_professor ?? prof.id)}
+                                                        disabled={!cursoSelecionado}
+                                                    >
+                                                        Atribuir
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
                                 </table>
                             </div>
                             <div className="flex justify-end gap-2">
