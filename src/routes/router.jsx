@@ -21,6 +21,8 @@ import TodosProfessores from '../pages/aluno/professores-aluno';
 import MainpageAlunoOrientando from "../pages/aluno/mainpage-aluno-orientando";
 import UsuariosAdmin from "../pages/admin/usuarios-admin";
 import ContatosProfessor from "../pages/professor/contatos-professor";
+import Documentacao from "../pages/professor/documentacao-professor";
+import DocumentacaoAluno from '../pages/aluno/documentacao-aluno';
 
 
 
@@ -52,6 +54,11 @@ function Router() {
       <Route path="/aluno/mainpage-aluno-orientando" element={<MainpageAlunoOrientando />} />
       <Route path="/admin/usuarios-admin" element={<UsuariosAdmin />} />
       <Route path="/professor/contatos" element={<ContatosProfessor />} />
+      
+      <Route path="/professor/documentacao-professor" element={<Documentacao />} />
+      <Route path="/aluno/documentacao-aluno" element={<DocumentacaoAluno />} />
+      
+      {/* Rotas de fallback */}
       <Route path="*" element={<Login />} />
     </Routes>
   );  

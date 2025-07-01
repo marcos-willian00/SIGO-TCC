@@ -22,7 +22,7 @@ export default function ProfessorMenu() {
         <Link to="/professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaHome /> Início
         </Link>
-        <Link to="/professor/documentacao" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+        <Link to="/professor/documentacao-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaBookOpen /> Documentação
         </Link>
         <Link to="/professor/contatos" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
