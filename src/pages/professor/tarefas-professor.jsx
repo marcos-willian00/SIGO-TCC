@@ -135,7 +135,192 @@ export default function TarefasProfessor() {
       (aluno.email && aluno.email.toLowerCase().includes(search.toLowerCase()))
   );
 
-  // ...restante do seu código (handleSelecionarAluno, handleVoltar, handleAddTask, etc)...
+// ...código acima...
+
+  // Selecionar aluno e buscar tarefas do TCC dele
+  const handleSelecionarAluno = async (aluno) => {
+    setAlunoSelecionado(aluno);
+    setShowNewTask(false);
+    setMenuTaskId(null);
+    setEditTaskId(null);
+    setTasks([]);
+    setTccId(null);
+
+    const tccIdAluno = aluno.tcc_id;
+    if (tccIdAluno) {
+      setTccId(tccIdAluno);
+      const token = localStorage.getItem("token");
+      const tarefasRes = await fetch(`http://localhost:8000/tccs/${tccIdAluno}/tarefas`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (tarefasRes.ok) {
+        const tarefas = await tarefasRes.json();
+        setTasks(tarefas);
+      } else {
+        setTasks([]);
+      }
+    } else {
+      setTasks([]);
+    }
+  };
+
+  // Voltar para lista de orientandos
+  const handleVoltar = () => {
+    setAlunoSelecionado(null);
+    setTasks([]);
+    setShowNewTask(false);
+    setMenuTaskId(null);
+    setEditTaskId(null);
+    setTccId(null);
+  };
+
+  // Drag and drop (apenas visual, não salva no backend)
+  const onDragEnd = async (result) => {
+    if (!result.destination) return;
+    const { source, destination } = result;
+
+    const sourceTasks = tasks.filter(t => t.status === source.droppableId)
+      .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
+    const destTasks = tasks.filter(t => t.status === destination.droppableId)
+      .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
+
+    if (source.droppableId === destination.droppableId) {
+      const newColumn = Array.from(sourceTasks);
+      const [removed] = newColumn.splice(source.index, 1);
+      newColumn.splice(destination.index, 0, removed);
+
+      const newTasks = [];
+      let i = 0;
+      tasks.forEach(t => {
+        if (t.status === source.droppableId) {
+          newTasks.push(newColumn[i]);
+          i++;
+        } else {
+          newTasks.push(t);
+        }
+      });
+      setTasks(newTasks);
+    } else {
+      const newSource = Array.from(sourceTasks);
+      const newDest = Array.from(destTasks);
+      const [removed] = newSource.splice(source.index, 1);
+      const newRemoved = { ...removed, status: destination.droppableId };
+      newDest.splice(destination.index, 0, newRemoved);
+
+      const newTasks = [];
+      let i = 0, j = 0;
+      tasks.forEach(t => {
+        if (t.status === source.droppableId) {
+          if (i < newSource.length) {
+            newTasks.push(newSource[i]);
+            i++;
+          }
+        } else if (t.status === destination.droppableId) {
+          if (j < newDest.length) {
+            newTasks.push(newDest[j]);
+            j++;
+          }
+        } else {
+          newTasks.push(t);
+        }
+      });
+      while (j < newDest.length) {
+        newTasks.push(newDest[j]);
+        j++;
+      }
+      setTasks(newTasks);
+    }
+  };
+
+  // Adicionar tarefa (sincronizado com backend)
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+    setAddTaskError("");
+    if (!newTaskTitle.trim() || !tccId) {
+      setAddTaskError("Selecione um aluno com TCC ativo para adicionar tarefa.");
+      return;
+    }
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`http://localhost:8000/tccs/${tccId}/tarefas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          titulo: newTaskTitle,
+          descricao: newTaskDescription,
+          status: newTaskStatus,
+        }),
+      });
+      if (response.ok) {
+        const tarefa = await response.json();
+        setTasks([...tasks, tarefa]);
+        setNewTaskTitle("");
+        setNewTaskDescription("");
+        setNewTaskStatus("a_fazer");
+        setShowNewTask(false);
+      } else {
+        let errorMsg = "Erro ao adicionar tarefa.";
+        try {
+          const error = await response.json();
+          if (Array.isArray(error) && error.length && error[0].msg) {
+            errorMsg = error[0].msg;
+          } else if (typeof error.detail === "string") {
+            errorMsg = error.detail;
+          } else if (typeof error.detail === "object") {
+            errorMsg = JSON.stringify(error.detail);
+          }
+        } catch {}
+        setAddTaskError(errorMsg);
+      }
+    } catch (err) {
+      setAddTaskError("Erro de conexão com o servidor.");
+      console.error("Erro ao adicionar tarefa:", err);
+    }
+  };
+
+  // Excluir tarefa (sincronizado com backend)
+  const handleDeleteTask = async (id) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`http://localhost:8000/tarefas/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) {
+      setTasks(tasks.filter((t) => t.id !== id));
+      setMenuTaskId(null);
+    }
+  };
+
+  // Editar tarefa (sincronizado com backend)
+  const handleEditTask = (id, title) => {
+    setEditTaskId(id);
+    setEditTaskTitle(title);
+    setMenuTaskId(null);
+  };
+
+  const handleSaveEditTask = async (id) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`http://localhost:8000/tarefas/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ titulo: editTaskTitle }),
+    });
+    if (response.ok) {
+      const tarefaAtualizada = await response.json();
+      setTasks(tasks.map((t) => (t.id === id ? tarefaAtualizada : t)));
+      setEditTaskId(null);
+      setEditTaskTitle("");
+    }
+  };
+
+// ...restante do seu código
+
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -176,54 +361,51 @@ export default function TarefasProfessor() {
             </div>
             {/* Modal de convite */}
             {showConvite && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative z-[101] border-2 border-[#2F9E41] animate-fade-in">
+              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl relative z-[101]">
                   <button
-                    className="absolute top-4 right-4 text-gray-400 hover:text-[#2F9E41] text-3xl font-bold transition"
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
                     onClick={() => setShowConvite(false)}
                     aria-label="Fechar"
                   >
                     ×
                   </button>
-                  <h2 className="text-2xl font-bold text-[#2F9E41] mb-6 text-center flex items-center justify-center gap-2">
-                    <span className="inline-block w-2 h-8 bg-[#2F9E41] rounded-full mr-2"></span>
-                    Convidar Aluno
-                  </h2>
+                  <h2 className="text-xl font-semibold mb-4">Convidar Aluno</h2>
                   {!alunoSelecionadoConvite ? (
                     <>
                       <input
                         type="text"
                         placeholder="Pesquisar por nome ou email..."
-                        className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] transition"
+                        className="border rounded px-4 py-2 mb-4 w-full"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         autoFocus
                       />
-                      <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-200 shadow-inner bg-gray-50">
+                      <div className="max-h-64 overflow-y-auto">
                         <table className="min-w-full text-left">
                           <thead>
                             <tr>
-                              <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Nome</th>
-                              <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Email</th>
+                              <th className="py-2 px-4 border-b font-semibold">Nome</th>
+                              <th className="py-2 px-4 border-b font-semibold">Email</th>
                               <th className="py-2 px-4 border-b font-semibold"></th>
                             </tr>
                           </thead>
                           <tbody>
                             {alunosFiltrados.length === 0 ? (
                               <tr>
-                                <td colSpan={3} className="py-4 text-center text-gray-400">
+                                <td colSpan={3} className="py-4 text-center text-gray-500">
                                   Nenhum aluno encontrado.
                                 </td>
                               </tr>
                             ) : (
                               alunosFiltrados.map((aluno) => (
-                                <tr key={aluno.id} className="hover:bg-[#e8fbe7] transition">
-                                  <td className="py-2 px-4">{aluno.nome}</td>
-                                  <td className="py-2 px-4">{aluno.email}</td>
-                                  <td className="py-2 px-4">
+                                <tr key={aluno.id}>
+                                  <td>{aluno.nome}</td>
+                                  <td>{aluno.email}</td>
+                                  <td>
                                     <button
                                       onClick={() => handleSelecionarAlunoConvite(aluno.id)}
-                                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded-lg font-semibold shadow transition"
+                                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
                                       disabled={loading}
                                     >
                                       Selecionar
@@ -242,35 +424,30 @@ export default function TarefasProfessor() {
                         e.preventDefault();
                         handleConvidar();
                       }}
-                      className="space-y-4"
                     >
-                      <div className="mb-2">
-                        <label className="block text-sm font-semibold text-[#2F9E41] mb-1">
-                          Título do TCC
-                        </label>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">Título do TCC</label>
                         <input
                           type="text"
-                          className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] transition"
+                          className="border rounded px-4 py-2 w-full"
                           value={tituloProposto}
                           onChange={e => setTituloProposto(e.target.value)}
                           required
                         />
                       </div>
-                      <div className="mb-2">
-                        <label className="block text-sm font-semibold text-[#2F9E41] mb-1">
-                          Descrição do TCC
-                        </label>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium mb-1">Descrição do TCC</label>
                         <textarea
-                          className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full min-h-[80px] focus:outline-none focus:ring-2 focus:ring-[#2F9E41] transition resize-none"
+                          className="border rounded px-4 py-2 w-full"
                           value={descricaoProposta}
                           onChange={e => setDescricaoProposta(e.target.value)}
                           required
                         />
                       </div>
-                      <div className="flex gap-3 justify-end mt-6">
+                      <div className="flex gap-2">
                         <button
                           type="submit"
-                          className="bg-[#2F9E41] hover:bg-[#217a32] text-white px-6 py-2 rounded-lg font-semibold shadow transition"
+                          className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition"
                           disabled={loading}
                         >
                           Enviar Convite
@@ -278,7 +455,7 @@ export default function TarefasProfessor() {
                         <button
                           type="button"
                           onClick={() => setAlunoSelecionadoConvite(null)}
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold shadow transition"
+                          className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition"
                         >
                           Voltar
                         </button>

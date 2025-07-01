@@ -85,12 +85,7 @@ export default function UsuariosAdmin() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-[#2F9E41]">Gerenciar Usuários</h1>
           <div className="flex gap-2">
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-              onClick={() => openModal("editar")}
-            >
-              Editar Usuário
-            </button>
+
             <button
               className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
               onClick={() => openModal("arquivar")}
