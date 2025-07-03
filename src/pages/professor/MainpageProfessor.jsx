@@ -8,15 +8,15 @@ export default function MainpageProfessor() {
     <>
       <ProfessorMenu />
       <div className="ml-64 bg-gray-100 min-h-screen p-6">
-        <h1 className="text-2xl font-bold text-[#374957] mb-4">Início</h1>
+        <h1 className="text-3xl font-bold text-[#2F9E41] mb-4">Início</h1>
 
         <div className="grid grid-cols-[2fr_1fr] gap-10">
           {/* Coluna Esquerda */}
           <div className="space-y-6">
             {/* Saudação + botão */}
-            <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
+            <div className="bg-white rounded-lg p-6 flex items-center justify-between shadow-sm hover:shadow-md transition">
               <div>
-                <h2 className="text-2xl font-bold text-[#2F9E41] mb-2">
+                <h2 className="text-2xl font-bold text-[#374957] mb-2">
                   Bom dia Prof. {nome}
                 </h2>
                 <p className="text-gray-700 max-w-md">
@@ -44,7 +44,7 @@ export default function MainpageProfessor() {
             </div>
 
             {/* Avisos Recentes */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition">
               <h3 className="text-xl font-bold text-[#374957] mb-4">
                 Avisos recentes
               </h3>
@@ -61,7 +61,7 @@ export default function MainpageProfessor() {
                     </div>
                     <Link
                       to="/professor/tarefas-professor"
-                      className="text-green-600 font-semibold hover:underline mr-4"
+                      className="bg-transparent border-1 border-green-600 text-green-600 font-regular px-6 -py-1 rounded-full hover:bg-green-600 hover:text-white transition-colors mr-4"
                     >
                       Ver
                     </Link>
@@ -71,7 +71,7 @@ export default function MainpageProfessor() {
             </div>
 
             {/* Meus Contatos */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition">
               <h3 className="text-xl font-bold text-[#374957] mb-4">
                 Meus Contatos
               </h3>
@@ -85,9 +85,12 @@ export default function MainpageProfessor() {
                     <p className="font-semibold">Whatsapp</p>
                     <p className="text-sm text-gray-600">(88) 9 9999-9999</p>
                   </div>
-                  <button className="text-green-600 font-semibold hover:underline mr-4">
+                  <Link
+                    to="/professor/contatos"
+                    className="bg-transparent border-1 border-green-600 text-green-600 font-regular px-7 -py-1 rounded-full hover:bg-green-600 hover:text-white transition-colors mr-4"
+                  >
                     Ir
-                  </button>
+                  </Link>
                 </div>
                 <div className="flex items-center justify-between bg-gray-50 p-3 rounded">
                   <div>
@@ -96,9 +99,12 @@ export default function MainpageProfessor() {
                       hudsonjosino@professor.ifce.edu.br
                     </p>
                   </div>
-                  <button className="text-green-600 font-semibold hover:underline mr-4">
+                  <Link
+                    to="/professor/contatos"
+                    className="bg-transparent border-1 border-green-600 text-green-600 font-regular px-7 -py-1 rounded-full hover:bg-green-600 hover:text-white transition-colors mr-4"
+                  >
                     Ir
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -107,9 +113,9 @@ export default function MainpageProfessor() {
           {/* Coluna Direita */}
           <div className="space-y-6">
             {/* Card: Entregas Marcadas */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-75 bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">1</p>
+                <p className="text-4xl font-bold text-[#374957]">1</p>
                 <p className="text-gray-600">Entregas marcadas</p>
               </div>
               {/* Imagem ilustrativa */}
@@ -121,9 +127,9 @@ export default function MainpageProfessor() {
             </div>
 
             {/* Card: Entregas Realizadas */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-75 bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">7</p>
+                <p className="text-4xl font-bold text-[#374957]">7</p>
                 <p className="text-gray-600">Entregas realizadas</p>
               </div>
               <img
@@ -134,9 +140,9 @@ export default function MainpageProfessor() {
             </div>
 
             {/* Card: Entregas Atrasadas */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-75 bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">2</p>
+                <p className="text-4xl font-bold text-[#374957]">2</p>
                 <p className="text-gray-600">Entregas atrasadas</p>
               </div>
               <img
@@ -147,9 +153,9 @@ export default function MainpageProfessor() {
             </div>
 
             {/* Card: Meses para Conclusão */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-75 bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">5</p>
+                <p className="text-4xl font-bold text-[#374957]">5</p>
                 <p className="text-gray-600">Meses para conclusão</p>
               </div>
               <img
