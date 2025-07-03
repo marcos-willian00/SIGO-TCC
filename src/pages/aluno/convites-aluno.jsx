@@ -44,7 +44,7 @@ export default function ConvitesAluno() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: "aceito" }),
+        body: JSON.stringify({ "status": "aceito" }),
       }
     );
     if (response.ok) {
@@ -70,7 +70,7 @@ export default function ConvitesAluno() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: "recusado" }),
+        body: JSON.stringify({ "status": "recusado" }),
       }
     );
     if (response.ok) {

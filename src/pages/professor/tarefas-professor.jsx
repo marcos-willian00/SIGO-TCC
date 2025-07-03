@@ -135,7 +135,7 @@ export default function TarefasProfessor() {
       (aluno.email && aluno.email.toLowerCase().includes(search.toLowerCase()))
   );
 
-// ...código acima...
+  // ...código acima...
 
   // Selecionar aluno e buscar tarefas do TCC dele
   const handleSelecionarAluno = async (aluno) => {
@@ -272,7 +272,7 @@ export default function TarefasProfessor() {
           } else if (typeof error.detail === "object") {
             errorMsg = JSON.stringify(error.detail);
           }
-        } catch {}
+        } catch { }
         setAddTaskError(errorMsg);
       }
     } catch (err) {
@@ -319,64 +319,65 @@ export default function TarefasProfessor() {
     }
   };
 
-// ...restante do seu código
+  // ...restante do seu código
 
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-white">
       <ProfessorMenu />
-      <div className="flex-1 ml-64 px-4 py-8 overflow-x-auto">
+      <div className="flex-1 ml-64 px-4 py-8 overflow-x-hidden">
         {!alunoSelecionado ? (
           <div>
-            <h1 className="text-2xl font-bold text-[#2F9E41] mb-2 ml-5 text-left">
+            <h1 className="text-3xl font-extrabold text-[#2F9E41] mb-4 ml-5 text-left drop-shadow">
               Meus Orientandos
             </h1>
-            {/* Botão de convite logo abaixo do título */}
             <button
               onClick={handleAbrirConvite}
-              className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition ml-5 mb-8"
+              className="flex items-center gap-2 bg-[#2F9E41] text-white px-5 py-2 rounded-lg shadow hover:bg-[#217a32] transition ml-5 mb-8 font-semibold"
             >
-              Convidar Aluno
+              <FiEdit2 /> Convidar Aluno
             </button>
-            
             <div className="flex flex-col gap-6 w-full max-w-5xl items-start ml-20">
               {alunos.map((aluno) => (
                 <button
                   key={aluno.id}
                   onClick={() => handleSelecionarAluno(aluno)}
-                  className="bg-white rounded-lg shadow p-6 w-full flex flex-row items-center justify-between hover:bg-[#D3FFD2] transition"
+                  className={`bg-white rounded-xl shadow-lg p-6 w-full flex flex-row items-center justify-between hover:bg-[#D3FFD2] transition border-2 ${aluno.tcc_id
+                      ? "border-[#2F9E41]"
+                      : "border-gray-200 opacity-70 cursor-not-allowed"
+                    }`}
                   disabled={!aluno.tcc_id}
                   title={!aluno.tcc_id ? "O aluno ainda não aceitou o convite de orientação." : ""}
                 >
                   <div>
-                    <span className="text-lg font-bold text-[#2F9E41]">{aluno.nome}</span>
+                    <span className="text-xl font-bold text-[#2F9E41]">{aluno.nome}</span>
                     <br />
                     <span className="text-gray-500 text-sm mt-2">
                       {aluno.tcc_id ? "Ver tarefas" : "Aguardando aceite do convite"}
                     </span>
                   </div>
-                  <FiChevronRight size={28} className="text-[#2F9E41]" />
+                  <FiChevronRight size={32} className="text-[#2F9E41]" />
                 </button>
               ))}
             </div>
             {/* Modal de convite */}
             {showConvite && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
-                <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl relative z-[101]">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative z-[101] border-2 border-[#2F9E41]">
                   <button
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-3xl"
                     onClick={() => setShowConvite(false)}
                     aria-label="Fechar"
                   >
                     ×
                   </button>
-                  <h2 className="text-xl font-semibold mb-4">Convidar Aluno</h2>
+                  <h2 className="text-2xl font-bold mb-4 text-[#2F9E41]">Convidar Aluno</h2>
                   {!alunoSelecionadoConvite ? (
                     <>
                       <input
                         type="text"
                         placeholder="Pesquisar por nome ou email..."
-                        className="border rounded px-4 py-2 mb-4 w-full"
+                        className="border-2 border-[#2F9E41] rounded px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         autoFocus
@@ -405,7 +406,7 @@ export default function TarefasProfessor() {
                                   <td>
                                     <button
                                       onClick={() => handleSelecionarAlunoConvite(aluno.id)}
-                                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition font-semibold"
                                       disabled={loading}
                                     >
                                       Selecionar
@@ -426,19 +427,19 @@ export default function TarefasProfessor() {
                       }}
                     >
                       <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Título do TCC</label>
+                        <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Título do TCC</label>
                         <input
                           type="text"
-                          className="border rounded px-4 py-2 w-full"
+                          className="border-2 border-[#2F9E41] rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                           value={tituloProposto}
                           onChange={e => setTituloProposto(e.target.value)}
                           required
                         />
                       </div>
                       <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Descrição do TCC</label>
+                        <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Descrição do TCC</label>
                         <textarea
-                          className="border rounded px-4 py-2 w-full"
+                          className="border-2 border-[#2F9E41] rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                           value={descricaoProposta}
                           onChange={e => setDescricaoProposta(e.target.value)}
                           required
@@ -447,7 +448,7 @@ export default function TarefasProfessor() {
                       <div className="flex gap-2">
                         <button
                           type="submit"
-                          className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition"
+                          className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
                           disabled={loading}
                         >
                           Enviar Convite
@@ -455,7 +456,7 @@ export default function TarefasProfessor() {
                         <button
                           type="button"
                           onClick={() => setAlunoSelecionadoConvite(null)}
-                          className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition"
+                          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition"
                         >
                           Voltar
                         </button>
@@ -468,31 +469,30 @@ export default function TarefasProfessor() {
             <ToastContainer />
           </div>
         ) : (
-          // ...restante do seu Kanban...
           <div>
             <button
               onClick={handleVoltar}
-              className="mb-4 text-[#2F9E41] hover:underline font-semibold"
+              className="mb-4 text-[#2F9E41] hover:underline font-semibold flex items-center gap-1"
             >
-              ← Voltar para orientandos
+              <FiChevronRight className="rotate-180" /> Voltar para orientandos
             </button>
-            <h2 className="text-xl font-bold text-[#2F9E41] mb-6 text-center">
+            <h2 className="text-2xl font-bold text-[#2F9E41] mb-6 text-center drop-shadow">
               Kanban de tarefas de {alunoSelecionado.nome}
             </h2>
             <div className="flex justify-end mb-4">
               <button
                 onClick={() => setShowNewTask(true)}
-                className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition"
+                className="flex items-center gap-2 bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold shadow"
                 disabled={!tccId}
                 title={!tccId ? "O aluno ainda não aceitou o convite de orientação." : ""}
               >
-                + Nova Tarefa
+                <FiEdit2 /> Nova Tarefa
               </button>
             </div>
             {showNewTask && (
               <form
                 onSubmit={handleAddTask}
-                className="bg-white rounded shadow p-4 mb-6 max-w-xl mx-auto"
+                className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-xl mx-auto border-2 border-[#2F9E41]"
               >
                 {addTaskError && (
                   <div className="text-red-600 mb-2">{addTaskError}</div>
@@ -501,7 +501,7 @@ export default function TarefasProfessor() {
                   <input
                     type="text"
                     placeholder="Título da tarefa"
-                    className="border rounded px-3 py-2 flex-1 min-w-0"
+                    className="border-2 border-[#2F9E41] rounded px-3 py-2 flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     required
@@ -509,13 +509,13 @@ export default function TarefasProfessor() {
                   <input
                     type="text"
                     placeholder="Descrição da tarefa"
-                    className="border rounded px-3 py-2 flex-1 min-w-0"
+                    className="border-2 border-[#2F9E41] rounded px-3 py-2 flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                     value={newTaskDescription}
                     onChange={(e) => setNewTaskDescription(e.target.value)}
                     required
                   />
                   <select
-                    className="border rounded px-3 py-2 flex-1 min-w-0"
+                    className="border-2 border-[#2F9E41] rounded px-3 py-2 flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                     value={newTaskStatus}
                     onChange={(e) => setNewTaskStatus(e.target.value)}
                   >
@@ -528,7 +528,7 @@ export default function TarefasProfessor() {
                   <div className="flex gap-2 flex-shrink-0">
                     <button
                       type="submit"
-                      className="bg-[#2F9E41] text-white px-4 py-2 rounded hover:bg-[#217a32] transition"
+                      className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
                       disabled={!tccId}
                     >
                       Adicionar
@@ -536,7 +536,7 @@ export default function TarefasProfessor() {
                     <button
                       type="button"
                       onClick={() => setShowNewTask(false)}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
                     >
                       Cancelar
                     </button>
@@ -556,22 +556,20 @@ export default function TarefasProfessor() {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`bg-white rounded-lg shadow-md min-w-[250px] max-w-xs flex flex-col transition-all h-full ${
-                            snapshot.isDraggingOver ? "bg-green-50" : ""
-                          }`}
+                          className={`bg-white rounded-2xl shadow-xl min-w-[210px] max-w-xs flex flex-col transition-all h-full border-2 ${snapshot.isDraggingOver ? "bg-green-50 border-[#2F9E41]" : "border-gray-200"
+                            }`}
                         >
                           <div
-                            className={`p-4 font-bold text-lg text-center ${
-                              col.key === "a_fazer"
+                            className={`p-4 font-bold text-lg text-center border-b ${col.key === "a_fazer"
                                 ? "text-red-600"
                                 : col.key === "fazendo"
-                                ? "text-yellow-600"
-                                : col.key === "revisar"
-                                ? "text-blue-600"
-                                : col.key === "feita"
-                                ? "text-green-600"
-                                : "text-gray-600"
-                            }`}
+                                  ? "text-yellow-600"
+                                  : col.key === "revisar"
+                                    ? "text-blue-600"
+                                    : col.key === "feita"
+                                      ? "text-green-600"
+                                      : "text-gray-600"
+                              }`}
                           >
                             {col.label}
                           </div>
@@ -584,9 +582,8 @@ export default function TarefasProfessor() {
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className={`bg-gray-100 rounded p-3 shadow flex flex-col gap-2 relative ${
-                                        snapshot.isDragging ? "ring-2 ring-green-400" : ""
-                                      }`}
+                                      className={`bg-gray-100 rounded-xl p-3 shadow flex flex-col gap-2 relative border ${snapshot.isDragging ? "ring-2 ring-green-400 border-[#2F9E41]" : "border-gray-200"
+                                        } hover:bg-green-50 transition`}
                                       style={provided.draggableProps.style}
                                       onClick={() =>
                                         setExpandedTaskId(
@@ -597,7 +594,7 @@ export default function TarefasProfessor() {
                                       <div className="flex items-center justify-between">
                                         {editTaskId === task.id ? (
                                           <input
-                                            className="border rounded px-2 py-1 flex-1 mr-2"
+                                            className="border-2 border-[#2F9E41] rounded px-2 py-1 flex-1 mr-2 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                                             value={editTaskTitle}
                                             onChange={(e) => setEditTaskTitle(e.target.value)}
                                             onBlur={() => handleSaveEditTask(task.id)}
@@ -645,7 +642,7 @@ export default function TarefasProfessor() {
                                     </div>
                                     {/* Modalzinho embaixo do card para descrição */}
                                     {expandedTaskId === task.id && (
-                                      <div className="bg-white border rounded shadow p-3 mt-2">
+                                      <div className="bg-white border-2 border-[#2F9E41] rounded-xl shadow p-3 mt-2">
                                         <div className="font-semibold mb-1 text-[#2F9E41]">Descrição:</div>
                                         <div className="text-gray-700">{task.descricao || task.description || "Sem descrição"}</div>
                                         <button
@@ -674,7 +671,8 @@ export default function TarefasProfessor() {
             </DragDropContext>
           </div>
         )}
-</div>
+        <ToastContainer />
+      </div>
     </div>
   );
 }
