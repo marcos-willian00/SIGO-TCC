@@ -285,13 +285,13 @@ export default function TarefasProfessor() {
   const handleDeleteTask = async (id) => {
     const token = localStorage.getItem("token");
     const response = await fetch(`http://localhost:8000/tarefas/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (response.ok) {
-      setTasks(tasks.filter((t) => t.id !== id));
-      setMenuTaskId(null);
-    }
+  method: "DELETE",
+  headers: { Authorization: `Bearer ${token}` },
+});
+if (!response.ok) {
+  const err = await response.text();
+  console.error("Erro ao deletar:", response.status, err);
+}
   };
 
   // Editar tarefa (sincronizado com backend)
@@ -362,110 +362,116 @@ export default function TarefasProfessor() {
             </div>
             {/* Modal de convite */}
             {showConvite && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
-                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative z-[101] border-2 border-[#2F9E41]">
-                  <button
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-3xl"
-                    onClick={() => setShowConvite(false)}
-                    aria-label="Fechar"
-                  >
-                    ×
-                  </button>
-                  <h2 className="text-2xl font-bold mb-4 text-[#2F9E41]">Convidar Aluno</h2>
-                  {!alunoSelecionadoConvite ? (
-                    <>
-                      <input
-                        type="text"
-                        placeholder="Pesquisar por nome ou email..."
-                        className="border-2 border-[#2F9E41] rounded px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        autoFocus
-                      />
-                      <div className="max-h-64 overflow-y-auto">
-                        <table className="min-w-full text-left">
-                          <thead>
-                            <tr>
-                              <th className="py-2 px-4 border-b font-semibold">Nome</th>
-                              <th className="py-2 px-4 border-b font-semibold">Email</th>
-                              <th className="py-2 px-4 border-b font-semibold"></th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {alunosFiltrados.length === 0 ? (
-                              <tr>
-                                <td colSpan={3} className="py-4 text-center text-gray-500">
-                                  Nenhum aluno encontrado.
-                                </td>
-                              </tr>
-                            ) : (
-                              alunosFiltrados.map((aluno) => (
-                                <tr key={aluno.id}>
-                                  <td>{aluno.nome}</td>
-                                  <td>{aluno.email}</td>
-                                  <td>
-                                    <button
-                                      onClick={() => handleSelecionarAlunoConvite(aluno.id)}
-                                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition font-semibold"
-                                      disabled={loading}
-                                    >
-                                      Selecionar
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </>
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
+    <div className="bg-white rounded-3xl shadow-2xl p-0 w-full max-w-2xl relative z-[101] border-2 border-[#2F9E41] overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-8 py-5 border-b border-[#2F9E41]/20 bg-gradient-to-r from-[#2F9E41]/10 to-white">
+        <h2 className="text-2xl font-bold text-[#2F9E41]">Convidar Aluno</h2>
+        <button
+          className="text-gray-500 hover:text-gray-700 text-3xl"
+          onClick={() => setShowConvite(false)}
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+      </div>
+      <div className="px-8 py-6">
+        {!alunoSelecionadoConvite ? (
+          <>
+            <input
+              type="text"
+              placeholder="Pesquisar por nome ou email..."
+              className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              autoFocus
+            />
+            <div className="max-h-64 overflow-y-auto rounded-lg border border-[#2F9E41]/10 shadow-inner bg-[#f8fff7]">
+              <table className="min-w-full text-left">
+                <thead>
+                  <tr className="bg-[#2F9E41]/10">
+                    <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Nome</th>
+                    <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Email</th>
+                    <th className="py-2 px-4 border-b font-semibold"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alunosFiltrados.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="py-4 text-center text-gray-500">
+                        Nenhum aluno encontrado.
+                      </td>
+                    </tr>
                   ) : (
-                    <form
-                      onSubmit={e => {
-                        e.preventDefault();
-                        handleConvidar();
-                      }}
-                    >
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Título do TCC</label>
-                        <input
-                          type="text"
-                          className="border-2 border-[#2F9E41] rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
-                          value={tituloProposto}
-                          onChange={e => setTituloProposto(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Descrição do TCC</label>
-                        <textarea
-                          className="border-2 border-[#2F9E41] rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
-                          value={descricaoProposta}
-                          onChange={e => setDescricaoProposta(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          type="submit"
-                          className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
-                          disabled={loading}
-                        >
-                          Enviar Convite
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAlunoSelecionadoConvite(null)}
-                          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition"
-                        >
-                          Voltar
-                        </button>
-                      </div>
-                    </form>
+                    alunosFiltrados.map((aluno) => (
+                      <tr key={aluno.id} className="hover:bg-[#e9ffe7] transition">
+                        <td className="px-4 py-2">{aluno.nome}</td>
+                        <td className="px-4 py-2">{aluno.email}</td>
+                        <td className="px-4 py-2">
+                          <button
+                            onClick={() => handleSelecionarAlunoConvite(aluno.id)}
+                            className="bg-yellow-500 text-white px-4 py-1.5 rounded-lg hover:bg-yellow-600 transition font-semibold shadow"
+                            disabled={loading}
+                          >
+                            Selecionar
+                          </button>
+                        </td>
+                      </tr>
+                    ))
                   )}
-                </div>
-              </div>
-            )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              handleConvidar();
+            }}
+          >
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Título do TCC</label>
+              <input
+                type="text"
+                className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
+                value={tituloProposto}
+                onChange={e => setTituloProposto(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Descrição do TCC</label>
+              <textarea
+                className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
+                value={descricaoProposta}
+                onChange={e => setDescricaoProposta(e.target.value)}
+                required
+                rows={4}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                type="submit"
+                className="bg-[#2F9E41] text-white px-6 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold shadow"
+                disabled={loading}
+              >
+                Enviar Convite
+              </button>
+              <button
+                type="button"
+                onClick={() => setAlunoSelecionadoConvite(null)}
+                className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition shadow"
+              >
+                Voltar
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  </div>
+)}
             <ToastContainer />
           </div>
         ) : (

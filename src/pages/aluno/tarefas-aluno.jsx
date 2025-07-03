@@ -3,18 +3,20 @@ import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import dayjs from "dayjs";
 
+// Ajuste os status para bater com o backend, se necessário
 const columns = [
-  { key: "todo", label: "To Do" },
-  { key: "today", label: "Do Today" },
-  { key: "inprogress", label: "In Progress" },
-  { key: "done", label: "Done" },
+  { key: "a_fazer", label: "A Fazer" },
+  { key: "fazendo", label: "Fazendo" },
+  { key: "revisar", label: "Revisar" },
+  { key: "feita", label: "Feita" },
+  { key: "concluida", label: "Concluída" },
 ];
 
 export default function KanbanAluno() {
   const [tasks, setTasks] = useState([]);
   const [uploadingTaskId, setUploadingTaskId] = useState(null);
+  const [expandedTaskId, setExpandedTaskId] = useState(null);
 
-  // Buscar tarefas do TCC do aluno ao montar
   useEffect(() => {
     async function fetchTarefas() {
       const token = localStorage.getItem("token");
@@ -81,7 +83,7 @@ export default function KanbanAluno() {
 
     if (response.ok) {
       alert("Arquivo enviado com sucesso!");
-      // Aqui você pode atualizar a tarefa se quiser mostrar arquivos enviados
+      // Atualize a tarefa se quiser mostrar arquivos enviados
     } else {
       alert("Erro ao enviar arquivo.");
     }
@@ -90,62 +92,110 @@ export default function KanbanAluno() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-white">
       <AlunoMenu />
-      <div className="flex-1 ml-64 px-4 py-8 overflow-x-auto">
-        <h2 className="text-xl font-bold text-[#2F9E41] mb-6 text-center">
+      <div className="flex-1 ml-64 px-4 py-8 overflow-x-hidden">
+        <h2 className="text-2xl font-bold text-[#2F9E41] mb-6 text-center drop-shadow">
           Meu Kanban de Tarefas
         </h2>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {columns.map((col) => (
-              <Droppable droppableId={col.key} key={col.key}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="bg-white rounded shadow p-4 min-h-[300px]"
-                  >
-                    <h3 className="text-lg font-bold mb-4 text-[#2F9E41]">{col.label}</h3>
-                    {tasks
-                      .filter((t) => t.status === col.key)
-                      .map((task, index) => (
-                        <Draggable draggableId={String(task.id)} index={index} key={task.id}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="bg-gray-100 rounded p-3 mb-3 shadow relative"
-                            >
-                              <div className="flex flex-col gap-2">
-                                <h4 className="font-semibold text-[#2F9E41]">{task.title}</h4>
-                                <p className="text-sm text-gray-600">{task.description}</p>
-                                <p className="text-xs text-gray-400">
-                                  Criado em {dayjs(task.createdAt).format('DD/MM/YYYY')}
-                                </p>
-                                <label className="block mt-2">
-                                  <span className="text-xs text-gray-700">Enviar arquivo:</span>
-                                  <input
-                                    type="file"
-                                    className="block mt-1"
-                                    onChange={(e) => handleFileChange(task.id, e)}
-                                    disabled={uploadingTaskId === task.id}
-                                  />
-                                </label>
+          <div className="flex gap-6 justify-center items-start overflow-x-auto pb-4">
+            {columns.map((col) => {
+              const columnTasks = tasks
+                .filter((t) => t.status === col.key)
+                .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
+              return (
+                <Droppable droppableId={col.key} key={col.key}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`bg-white rounded-2xl shadow-xl min-w-[210px] max-w-xs flex flex-col transition-all h-full border-2 ${
+                        snapshot.isDraggingOver ? "bg-green-50 border-[#2F9E41]" : "border-gray-200"
+                      }`}
+                    >
+                      <div
+                        className={`p-4 font-bold text-lg text-center border-b ${
+                          col.key === "a_fazer"
+                            ? "text-red-600"
+                            : col.key === "fazendo"
+                            ? "text-yellow-600"
+                            : col.key === "revisar"
+                            ? "text-blue-600"
+                            : col.key === "feita"
+                            ? "text-green-600"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {col.label}
+                      </div>
+                      <div className="flex-1 p-2 space-y-3 min-h-[60px]">
+                        {columnTasks.map((task, idx) => (
+                          <Draggable draggableId={task.id.toString()} index={idx} key={task.id}>
+                            {(provided, snapshot) => (
+                              <div key={task.id}>
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className={`bg-gray-100 rounded-xl p-3 shadow flex flex-col gap-2 relative border ${
+                                    snapshot.isDragging ? "ring-2 ring-green-400 border-[#2F9E41]" : "border-gray-200"
+                                  } hover:bg-green-50 transition`}
+                                  style={provided.draggableProps.style}
+                                  onClick={() =>
+                                    setExpandedTaskId(
+                                      expandedTaskId === task.id ? null : task.id
+                                    )
+                                  }
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-medium">{task.titulo || task.title}</span>
+                                  </div>
+                                  <span className="text-xs text-gray-500 mt-1">
+                                    Criada em: {dayjs(task.createdAt || task.created_at).isValid()
+                                      ? dayjs(task.createdAt || task.created_at).format("DD/MM/YYYY HH:mm")
+                                      : "Data inválida"}
+                                  </span>
+                                </div>
+                                {/* Modalzinho embaixo do card para descrição e upload */}
+                                {expandedTaskId === task.id && (
+                                  <div className="bg-white border-2 border-[#2F9E41] rounded-xl shadow p-3 mt-2">
+                                    <div className="font-semibold mb-1 text-[#2F9E41]">Descrição:</div>
+                                    <div className="text-gray-700 mb-2">{task.descricao || task.description || "Sem descrição"}</div>
+                                    <label className="block mt-2">
+                                      <span className="text-xs text-gray-700">Enviar arquivo:</span>
+                                      <input
+                                        type="file"
+                                        className="block mt-1"
+                                        onChange={(e) => handleFileChange(task.id, e)}
+                                        disabled={uploadingTaskId === task.id}
+                                      />
+                                    </label>
+                                    <button
+                                      className="mt-2 text-sm text-[#2F9E41] hover:underline"
+                                      onClick={() => setExpandedTaskId(null)}
+                                    >
+                                      Fechar
+                                    </button>
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            ))}
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                        {columnTasks.length === 0 && (
+                          <div className="text-gray-400 text-center text-sm">Sem tarefas</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </Droppable>
+              );
+            })}
           </div>
         </DragDropContext>
       </div>
     </div>
   );
-}
+º}
