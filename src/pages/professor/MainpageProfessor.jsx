@@ -38,7 +38,7 @@ export default function MainpageProfessor() {
                 <img
                   src="./public/Asset 1 1.svg"
                   alt="Boas-vindas"
-                  className="w-full"
+                  className="w-full -ml-9"
                 />
               </div>
             </div>
