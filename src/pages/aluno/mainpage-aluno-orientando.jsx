@@ -105,10 +105,10 @@ export default function MainpageAlunoOrientando() {
           {/* Coluna Direita */}
           <div className="space-y-6">
             {/* Card: Entregas Marcadas */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-100 bg-white rounded-lg shadow p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">1</p>
-                <p className="text-gray-600">Entregas marcadas</p>
+                <p className="text-2xl font-bold text-green-600">O que é o TCC?</p>
+                <p className="text-1xl text-gray-600">É um trabalho de pesquisa que desenvolve sua autonomia, pensamento crítico e domínio do curso.</p>
               </div>
               {/* Imagem ilustrativa */}
               <img
@@ -119,10 +119,10 @@ export default function MainpageAlunoOrientando() {
             </div>
 
             {/* Card: Entregas Realizadas */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-100 bg-white rounded-lg shadow p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">7</p>
-                <p className="text-gray-600">Entregas realizadas</p>
+                <p className="text-2xl font-bold text-green-600">Rotina de sucesso</p>
+                <p className="text-1xl text-gray-600">Avance um pouco todo dia. Progresso constante é melhor que perfeição repentina.</p>
               </div>
               <img
                 src="./public/Asset 1.svg"
@@ -132,10 +132,10 @@ export default function MainpageAlunoOrientando() {
             </div>
 
             {/* Card: Entregas Atrasadas */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-100 bg-white rounded-lg shadow p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">2</p>
-                <p className="text-gray-600">Entregas atrasadas</p>
+                <p className="text-2xl font-bold text-green-600">Você sabia?</p>
+                <p className="text-1xl text-gray-600">A maioria dos alunos conclui o TCC com mais de 80% das tarefas feitas no prazo.</p>
               </div>
               <img
                 src="./public/Asset 1a.svg"
@@ -145,10 +145,10 @@ export default function MainpageAlunoOrientando() {
             </div>
 
             {/* Card: Meses para Conclusão */}
-            <div className="w-75 bg-white rounded-lg shadow p-6 flex justify-between items-center">
+            <div className="w-100 bg-white rounded-lg shadow p-6 flex justify-between items-center">
               <div>
-                <p className="text-4xl font-bold text-green-600">5</p>
-                <p className="text-gray-600">Meses para conclusão</p>
+                <p className="text-2xl font-bold text-green-600">Organize seu tempo</p>
+                <p className="text-1xl text-gray-600">Reserve pelo menos 4h por semana só para revisar e ajustar seu projeto.</p>
               </div>
               <img
                 src="./public/Asset 1gg.svg"

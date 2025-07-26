@@ -27,12 +27,12 @@ export default function MainpageAluno() {
       <AlunoMenu />
       <div className="ml-64 bg-gray-100 min-h-screen">
         <div className="px-6 py-1 bg-gray-100">
-          <h1 className="text-2xl font-bold text-[#374957] ml-6 mt-8">
-            Área do Aluno
+          <h1 className="text-3xl font-bold text-[#2F9E41] ml-6 mt-6">
+            Início
           </h1>
         </div>
         <div className="w-full max-w-[1200px] mx-auto my-8 px-6 md:px-12 py-6 bg-white rounded-lg shadow">
-          <h2 className="text-xl font-bold text-[#2F9E41] mb-2">
+          <h2 className="text-xl font-bold text-[#374957] mb-2">
             Bem vindo(a), {nome}
           </h2>
 
