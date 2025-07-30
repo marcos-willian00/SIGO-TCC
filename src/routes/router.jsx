@@ -10,6 +10,7 @@ import MainpageCoordenador from '../pages/coordenador/MainpageCoordenador';
 import MeuPerfilAluno from '../pages/aluno/meu-perfil-aluno';
 import AdminDashboard from '../pages/admin/admin-dashboard';
 import CursosAdmin from '../pages/admin/cursos-admin';
+import AnexoArquivos from '../pages/admin/anexo-arquivos';
 import MeuPerfilCoordenador from '../pages/coordenador/meu-perfil-coordenador';
 import MeuPerfilProfessor from '../pages/professor/meu-perfil-professor';
 import ProfessoresDepartamento from '../pages/coordenador/professores-departamento';
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/coordenador" element={<MainpageCoordenador />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/cursos-admin" element={<CursosAdmin />} />
+      <Route path="/admin/anexo-arquivos" element={<AnexoArquivos />} />
       <Route path="/coordenador/meu-perfil-coordenador" element={<MeuPerfilCoordenador />} />
       <Route path="/professor/meu-perfil-professor" element={<MeuPerfilProfessor />} />
       <Route path="/coordenador/professores-departamento" element={<ProfessoresDepartamento />} />

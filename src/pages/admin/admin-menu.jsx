@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaUsers, FaUser, FaUserShield, FaChalkboardTeacher, FaBook } from "react-icons/fa";
+import { FaHome, FaUsers, FaUser, FaUserShield, FaChalkboardTeacher, FaBook, FaFileUpload } from "react-icons/fa";
 
 export default function AdminMenu() {
   const navigate = useNavigate();
@@ -28,6 +28,9 @@ export default function AdminMenu() {
           </Link>
           <Link to="/admin/cursos-admin" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaBook /> Cursos
+          </Link>
+          <Link to="/admin/anexo-arquivos" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+            <FaFileUpload /> Anexo de Arquivos
           </Link>
           <Link to="/admin/perfil" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaUser /> Meu Perfil
