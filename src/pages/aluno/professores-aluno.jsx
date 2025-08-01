@@ -1,70 +1,105 @@
+import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
+import axios from "axios";
 import AlunoMenu from "./aluno-menu";
 
-const professores = [
-  {
-    nome: "José Emerson Costa",
-    curso: "Sistemas de Informação",
-    area: "Programação",
-    orientandos: 3,
-    cor: "text-yellow-500",
-  },
-  {
-    nome: "José Olinda Pereira",
-    curso: "Sistemas de Informação",
-    area: "Lógica",
-    orientandos: 6,
-    cor: "text-red-600",
-  },
-  {
-    nome: "Antonio Pereira da Costa",
-    curso: "Sistemas de Informação",
-    area: "LLPD",
-    orientandos: 1,
-    cor: "text-green-600",
-  },
-];
+const getCorPorOrientandos = (orientandos) => {
+  if (orientandos >= 6) {
+    return "text-red-600";
+  }
+  if (orientandos >= 3) {
+    return "text-yellow-500";
+  }
+  return "text-green-600";
+};
 
 export default function TodosProfessores() {
-  return (
-    <>
-      <AlunoMenu />
-      <div className="ml-64 bg-gray-100 min-h-screen">
-        <div className="px-6 py-2 bg-gray-100">
-          <h1 className="text-2xl font-bold text-[#374957] ml-6 mt-8">
-            Professores
-          </h1>
-        </div>
+  const [professores, setProfessores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-        <div className="w-full max-w-[1200px] mx-auto my-8 px-6 md:px-12 py-6 bg-white rounded-lg shadow min-h-64">
-          <div className="ml-6 mt-8 flex flex-wrap gap-6">
-            {professores.map((prof, idx) => (
+  useEffect(() => {
+  const fetchProfessores = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Usuário não autenticado.");
+      }
+
+      const response = await axios.get("http://localhost:8000/students/professors", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const listaCompleta = response.data;
+      const listaFiltrada = listaCompleta.filter(
+        (usuario) => usuario.role !== 'admin'
+      );
+
+      setProfessores(listaFiltrada);
+
+    } catch (err) {
+      setError("Falha ao carregar os professores. Tente novamente mais tarde.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProfessores();
+}, []);
+
+  return (
+  <>
+    <AlunoMenu />
+    <div className="min-h-screen bg-gray-100 md:ml-64">
+      <div className="p-4 sm:p-6 lg:p-8">
+        <h1 className="text-2xl font-bold text-green-600 sm:text-3xl mb-8">
+          Professores
+        </h1>
+
+        {loading && <p className="text-center text-gray-600">Carregando professores...</p>}
+        {error && <p className="text-center text-red-600 font-semibold">{error}</p>}
+
+        {!loading && !error && (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {professores.map((prof) => (
               <div
-                key={idx}
-                className="flex-1 min-w-[300px] max-w-sm border border-green-600 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
+                key={prof.id}
+                className="w-full rounded-lg border border-green-600 bg-white p-5 shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-lg font-semibold text-[#1C1C1C]">
+                <div className="flex items-start justify-between mb-3">
+                  <h2 className="text-lg font-bold text-gray-900">
                     {prof.nome}
                   </h2>
-                  <Eye className="w-5 h-5 text-gray-700" />
+                  <Eye className="h-5 w-5 text-gray-500" />
                 </div>
 
-                <p className="text-sm text-gray-800 mb-1">
-                  <strong>Curso:</strong> {prof.curso}
-                </p>
-                <p className="text-sm text-gray-800 mb-1">
-                  <strong>Área:</strong> {prof.area}
-                </p>
-                <p className="text-sm text-gray-800">
-                  <strong>Nº de Orientandos:</strong>{" "}
-                  <span className={prof.cor}>{prof.orientandos}</span>
-                </p>
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-700">
+                    <strong>Curso:</strong> {prof.departamento}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Área:</strong> {prof.departamento || "Não especificada"}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Nº de Orientandos:</strong>{" "}
+                    <span
+                      className={`font-bold ${getCorPorOrientandos(
+                        prof.orientandos_count
+                      )}`}
+                    >
+                      {prof.orientandos_count}
+                    </span>
+                  </p>
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 }
