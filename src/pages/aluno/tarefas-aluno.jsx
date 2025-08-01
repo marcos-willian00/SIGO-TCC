@@ -1,5 +1,5 @@
 import AlunoMenu from "./aluno-menu";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import dayjs from "dayjs";
 
@@ -16,21 +16,27 @@ export default function KanbanAluno() {
   const [tasks, setTasks] = useState([]);
   const [uploadingTaskId, setUploadingTaskId] = useState(null);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
+  const pollingRef = useRef();
 
-  useEffect(() => {
-    async function fetchTarefas() {
-      const token = localStorage.getItem("token");
-      const tccId = localStorage.getItem("tcc_id");
-      if (!tccId) return;
-      const response = await fetch(`http://localhost:8000/tccs/${tccId}/tarefas`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setTasks(data);
-      }
+  // Função para buscar tarefas do backend
+  const fetchTarefas = async () => {
+    const token = localStorage.getItem("token");
+    const tccId = localStorage.getItem("tcc_id");
+    if (!tccId) return;
+    const response = await fetch(`http://localhost:8000/tccs/${tccId}/tarefas`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      setTasks(data);
     }
+  };
+
+  // Polling para sincronizar com o backend a cada 5 segundos
+  useEffect(() => {
     fetchTarefas();
+    pollingRef.current = setInterval(fetchTarefas, 5000);
+    return () => clearInterval(pollingRef.current);
   }, []);
 
   // Atualizar status da tarefa ao arrastar
@@ -55,12 +61,8 @@ export default function KanbanAluno() {
         body: JSON.stringify({ status: destination.droppableId }),
       });
 
-      // Atualiza localmente
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === tarefaId ? { ...t, status: destination.droppableId } : t
-        )
-      );
+      // Atualiza do backend para garantir sincronização
+      fetchTarefas();
     }
   };
 
@@ -83,7 +85,7 @@ export default function KanbanAluno() {
 
     if (response.ok) {
       alert("Arquivo enviado com sucesso!");
-      // Atualize a tarefa se quiser mostrar arquivos enviados
+      fetchTarefas(); // Atualiza tarefas após upload
     } else {
       alert("Erro ao enviar arquivo.");
     }
@@ -98,6 +100,12 @@ export default function KanbanAluno() {
         <h2 className="text-2xl font-bold text-[#2F9E41] mb-6 text-center drop-shadow">
           Meu Kanban de Tarefas
         </h2>
+        <button
+          className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg mb-4"
+          onClick={fetchTarefas}
+        >
+          Atualizar Tarefas
+        </button>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="flex gap-6 justify-center items-start overflow-x-auto pb-4">
             {columns.map((col) => {
@@ -198,4 +206,4 @@ export default function KanbanAluno() {
       </div>
     </div>
   );
-º}
+}

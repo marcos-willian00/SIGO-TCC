@@ -1,9 +1,36 @@
 import ProfessorMenu from "./menu-professor";
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { FiMoreVertical, FiEdit2, FiTrash2, FiChevronRight } from "react-icons/fi";
+import {
+  FiMoreVertical,
+  FiEdit2,
+  FiTrash2,
+  FiChevronRight,
+  FiPaperclip,
+  FiEye,
+  FiDownload,
+} from "react-icons/fi";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
+
+// Modal base
+function Modal({ open, onClose, children }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 min-w-[320px] max-w-lg w-full relative border-2 border-[#2F9E41]">
+        <button
+          className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-gray-700"
+          onClick={onClose}
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 // Status conforme backend
 const columns = [
@@ -23,17 +50,21 @@ export default function TarefasProfessor() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState("a_fazer");
+  const [newTaskFile, setNewTaskFile] = useState(null);
   const [menuTaskId, setMenuTaskId] = useState(null);
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTaskTitle, setEditTaskTitle] = useState("");
+  const [editTaskDescription, setEditTaskDescription] = useState("");
+  const [editTaskStatus, setEditTaskStatus] = useState("a_fazer");
+  const [editTaskFile, setEditTaskFile] = useState(null);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [addTaskError, setAddTaskError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Estados para convite
   const [showConvite, setShowConvite] = useState(false);
   const [alunosConvite, setAlunosConvite] = useState([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
   const [alunoSelecionadoConvite, setAlunoSelecionadoConvite] = useState(null);
   const [tituloProposto, setTituloProposto] = useState("");
   const [descricaoProposta, setDescricaoProposta] = useState("");
@@ -135,8 +166,6 @@ export default function TarefasProfessor() {
       (aluno.email && aluno.email.toLowerCase().includes(search.toLowerCase()))
   );
 
-  // ...código acima...
-
   // Selecionar aluno e buscar tarefas do TCC dele
   const handleSelecionarAluno = async (aluno) => {
     setAlunoSelecionado(aluno);
@@ -150,7 +179,7 @@ export default function TarefasProfessor() {
     if (tccIdAluno) {
       setTccId(tccIdAluno);
       const token = localStorage.getItem("token");
-      const tarefasRes = await fetch(`http://localhost:8000/tccs/${tccIdAluno}/tarefas`, {
+      const tarefasRes = await fetch(`http://localhost:8000/professors/tccs/${tccIdAluno}/tarefas`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (tarefasRes.ok) {
@@ -174,17 +203,43 @@ export default function TarefasProfessor() {
     setTccId(null);
   };
 
-  // Drag and drop (apenas visual, não salva no backend)
+  // Drag and drop (agora salva status no backend)
   const onDragEnd = async (result) => {
     if (!result.destination) return;
     const { source, destination } = result;
 
-    const sourceTasks = tasks.filter(t => t.status === source.droppableId)
-      .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
-    const destTasks = tasks.filter(t => t.status === destination.droppableId)
-      .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
+    // Só atualiza se mudou de coluna (status)
+    if (source.droppableId !== destination.droppableId) {
+      const sourceTasks = tasks.filter(t => t.status === source.droppableId)
+        .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
+      const movedTask = sourceTasks[source.index];
 
-    if (source.droppableId === destination.droppableId) {
+      // Atualiza status no backend
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(`http://localhost:8000/professors/tarefas/${movedTask.id}/status`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: destination.droppableId }),
+        });
+        if (response.ok) {
+          const tarefaAtualizada = await response.json();
+          setTasks(tasks.map(t =>
+            t.id === tarefaAtualizada.id ? tarefaAtualizada : t
+          ));
+        } else {
+          toast.error("Erro ao atualizar status da tarefa.");
+        }
+      } catch {
+        toast.error("Erro de conexão ao atualizar status.");
+      }
+    } else {
+      // Se só mudou a ordem, atualiza localmente
+      const sourceTasks = tasks.filter(t => t.status === source.droppableId)
+        .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
       const newColumn = Array.from(sourceTasks);
       const [removed] = newColumn.splice(source.index, 1);
       newColumn.splice(destination.index, 0, removed);
@@ -200,39 +255,10 @@ export default function TarefasProfessor() {
         }
       });
       setTasks(newTasks);
-    } else {
-      const newSource = Array.from(sourceTasks);
-      const newDest = Array.from(destTasks);
-      const [removed] = newSource.splice(source.index, 1);
-      const newRemoved = { ...removed, status: destination.droppableId };
-      newDest.splice(destination.index, 0, newRemoved);
-
-      const newTasks = [];
-      let i = 0, j = 0;
-      tasks.forEach(t => {
-        if (t.status === source.droppableId) {
-          if (i < newSource.length) {
-            newTasks.push(newSource[i]);
-            i++;
-          }
-        } else if (t.status === destination.droppableId) {
-          if (j < newDest.length) {
-            newTasks.push(newDest[j]);
-            j++;
-          }
-        } else {
-          newTasks.push(t);
-        }
-      });
-      while (j < newDest.length) {
-        newTasks.push(newDest[j]);
-        j++;
-      }
-      setTasks(newTasks);
     }
   };
 
-  // Adicionar tarefa (sincronizado com backend)
+  // Adicionar tarefa (sincronizado com backend, permite arquivo)
   const handleAddTask = async (e) => {
     e.preventDefault();
     setAddTaskError("");
@@ -241,18 +267,20 @@ export default function TarefasProfessor() {
       return;
     }
     const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("titulo", newTaskTitle);
+    formData.append("descricao", newTaskDescription);
+    formData.append("status", newTaskStatus);
+    if (newTaskFile) formData.append("file", newTaskFile);
+
     try {
-      const response = await fetch(`http://localhost:8000/tccs/${tccId}/tarefas`, {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8000/professors/tccs/${tccId}/tarefas`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          titulo: newTaskTitle,
-          descricao: newTaskDescription,
-          status: newTaskStatus,
-        }),
+        body: formData,
       });
       if (response.ok) {
         const tarefa = await response.json();
@@ -260,67 +288,125 @@ export default function TarefasProfessor() {
         setNewTaskTitle("");
         setNewTaskDescription("");
         setNewTaskStatus("a_fazer");
+        setNewTaskFile(null);
         setShowNewTask(false);
+        toast.success("Tarefa criada com sucesso!");
       } else {
         let errorMsg = "Erro ao adicionar tarefa.";
         try {
           const error = await response.json();
-          if (Array.isArray(error) && error.length && error[0].msg) {
-            errorMsg = error[0].msg;
-          } else if (typeof error.detail === "string") {
-            errorMsg = error.detail;
-          } else if (typeof error.detail === "object") {
-            errorMsg = JSON.stringify(error.detail);
-          }
+          errorMsg = error.detail || errorMsg;
         } catch { }
         setAddTaskError(errorMsg);
       }
     } catch (err) {
       setAddTaskError("Erro de conexão com o servidor.");
       console.error("Erro ao adicionar tarefa:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   // Excluir tarefa (sincronizado com backend)
   const handleDeleteTask = async (id) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:8000/tarefas/${id}`, {
-  method: "DELETE",
-  headers: { Authorization: `Bearer ${token}` },
-});
-if (!response.ok) {
-  const err = await response.text();
-  console.error("Erro ao deletar:", response.status, err);
-}
+    try {
+      const response = await fetch(`http://localhost:8000/professors/tarefas/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok || response.status === 204) {
+        setTasks(tasks.filter((t) => t.id !== id));
+        setMenuTaskId(null);
+        toast.success("Tarefa excluída com sucesso!");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.detail || "Erro ao excluir tarefa.");
+      }
+    } catch (error) {
+      toast.error("Erro ao conectar com o servidor.");
+      console.error("Erro ao excluir tarefa:", error);
+    }
   };
 
-  // Editar tarefa (sincronizado com backend)
-  const handleEditTask = (id, title) => {
-    setEditTaskId(id);
-    setEditTaskTitle(title);
+  // Editar tarefa (sincronizado com backend, permite arquivo)
+  const handleEditTask = (task) => {
+    setEditTaskId(task.id);
+    setEditTaskTitle(task.titulo || "");
+    setEditTaskDescription(task.descricao || "");
+    setEditTaskStatus(task.status || "a_fazer");
+    setEditTaskFile(null);
     setMenuTaskId(null);
   };
 
   const handleSaveEditTask = async (id) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:8000/tarefas/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ titulo: editTaskTitle }),
-    });
-    if (response.ok) {
-      const tarefaAtualizada = await response.json();
-      setTasks(tasks.map((t) => (t.id === id ? tarefaAtualizada : t)));
-      setEditTaskId(null);
-      setEditTaskTitle("");
+    const formData = new FormData();
+    formData.append("titulo", editTaskTitle);
+    formData.append("descricao", editTaskDescription);
+    formData.append("status", editTaskStatus);
+    if (editTaskFile) formData.append("file", editTaskFile);
+
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8000/professors/tarefas/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      if (response.ok) {
+        const tarefaAtualizada = await response.json();
+        setTasks(tasks.map((t) => (t.id === id ? tarefaAtualizada : t)));
+        setEditTaskId(null);
+        setEditTaskTitle("");
+        setEditTaskDescription("");
+        setEditTaskStatus("a_fazer");
+        setEditTaskFile(null);
+        toast.success("Tarefa atualizada com sucesso!");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.detail || "Erro ao atualizar tarefa.");
+      }
+    } catch (error) {
+      toast.error("Erro ao conectar com o servidor.");
+      console.error("Erro ao atualizar tarefa:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ...restante do seu código
-
+  // Estilização do campo de upload de arquivo (usado em criação e edição)
+  function FileUpload({ file, setFile }) {
+    return (
+      <label className="flex flex-col gap-1 text-sm text-[#2F9E41] font-semibold">
+        <span className="flex items-center gap-2">
+          <FiPaperclip /> Anexar arquivo
+        </span>
+        <div className="relative w-fit">
+          <input
+            type="file"
+            id="file-upload"
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            onChange={e => setFile(e.target.files[0])}
+            accept=".pdf,.docx"
+          />
+          <label
+            htmlFor="file-upload"
+            className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg shadow cursor-pointer hover:bg-[#217a32] transition font-semibold flex items-center gap-2"
+          >
+            <FiPaperclip /> Selecionar arquivo
+          </label>
+        </div>
+        {file && (
+          <span className="text-xs text-gray-600 mt-1 flex items-center gap-1">
+            <FiPaperclip className="text-[#2F9E41]" /> {file.name}
+          </span>
+        )}
+      </label>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-white">
@@ -361,117 +447,103 @@ if (!response.ok) {
               ))}
             </div>
             {/* Modal de convite */}
-            {showConvite && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
-    <div className="bg-white rounded-3xl shadow-2xl p-0 w-full max-w-2xl relative z-[101] border-2 border-[#2F9E41] overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-8 py-5 border-b border-[#2F9E41]/20 bg-gradient-to-r from-[#2F9E41]/10 to-white">
-        <h2 className="text-2xl font-bold text-[#2F9E41]">Convidar Aluno</h2>
-        <button
-          className="text-gray-500 hover:text-gray-700 text-3xl"
-          onClick={() => setShowConvite(false)}
-          aria-label="Fechar"
-        >
-          ×
-        </button>
-      </div>
-      <div className="px-8 py-6">
-        {!alunoSelecionadoConvite ? (
-          <>
-            <input
-              type="text"
-              placeholder="Pesquisar por nome ou email..."
-              className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoFocus
-            />
-            <div className="max-h-64 overflow-y-auto rounded-lg border border-[#2F9E41]/10 shadow-inner bg-[#f8fff7]">
-              <table className="min-w-full text-left">
-                <thead>
-                  <tr className="bg-[#2F9E41]/10">
-                    <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Nome</th>
-                    <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Email</th>
-                    <th className="py-2 px-4 border-b font-semibold"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {alunosFiltrados.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="py-4 text-center text-gray-500">
-                        Nenhum aluno encontrado.
-                      </td>
-                    </tr>
-                  ) : (
-                    alunosFiltrados.map((aluno) => (
-                      <tr key={aluno.id} className="hover:bg-[#e9ffe7] transition">
-                        <td className="px-4 py-2">{aluno.nome}</td>
-                        <td className="px-4 py-2">{aluno.email}</td>
-                        <td className="px-4 py-2">
-                          <button
-                            onClick={() => handleSelecionarAlunoConvite(aluno.id)}
-                            className="bg-yellow-500 text-white px-4 py-1.5 rounded-lg hover:bg-yellow-600 transition font-semibold shadow"
-                            disabled={loading}
-                          >
-                            Selecionar
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
-        ) : (
-          <form
-            onSubmit={e => {
-              e.preventDefault();
-              handleConvidar();
-            }}
-          >
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Título do TCC</label>
-              <input
-                type="text"
-                className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
-                value={tituloProposto}
-                onChange={e => setTituloProposto(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Descrição do TCC</label>
-              <textarea
-                className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
-                value={descricaoProposta}
-                onChange={e => setDescricaoProposta(e.target.value)}
-                required
-                rows={4}
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <button
-                type="submit"
-                className="bg-[#2F9E41] text-white px-6 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold shadow"
-                disabled={loading}
-              >
-                Enviar Convite
-              </button>
-              <button
-                type="button"
-                onClick={() => setAlunoSelecionadoConvite(null)}
-                className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition shadow"
-              >
-                Voltar
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
-  </div>
-)}
+            <Modal open={showConvite} onClose={() => setShowConvite(false)}>
+              <div>
+                <h2 className="text-2xl font-bold text-[#2F9E41] mb-4">Convidar Aluno</h2>
+                {!alunoSelecionadoConvite ? (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Pesquisar por nome ou email..."
+                      className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      autoFocus
+                    />
+                    <div className="max-h-64 overflow-y-auto rounded-lg border border-[#2F9E41]/10 shadow-inner bg-[#f8fff7]">
+                      <table className="min-w-full text-left">
+                        <thead>
+                          <tr className="bg-[#2F9E41]/10">
+                            <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Nome</th>
+                            <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Email</th>
+                            <th className="py-2 px-4 border-b font-semibold"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {alunosFiltrados.length === 0 ? (
+                            <tr>
+                              <td colSpan={3} className="py-4 text-center text-gray-500">
+                                Nenhum aluno encontrado.
+                              </td>
+                            </tr>
+                          ) : (
+                            alunosFiltrados.map((aluno) => (
+                              <tr key={aluno.id} className="hover:bg-[#e9ffe7] transition">
+                                <td className="px-4 py-2">{aluno.nome}</td>
+                                <td className="px-4 py-2">{aluno.email}</td>
+                                <td className="px-4 py-2">
+                                  <button
+                                    onClick={() => handleSelecionarAlunoConvite(aluno.id)}
+                                    className="bg-yellow-500 text-white px-4 py-1.5 rounded-lg hover:bg-yellow-600 transition font-semibold shadow"
+                                    disabled={loading}
+                                  >
+                                    Selecionar
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <form
+                    onSubmit={e => {
+                      e.preventDefault();
+                      handleConvidar();
+                    }}
+                  >
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Título do TCC</label>
+                      <input
+                        type="text"
+                        className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
+                        value={tituloProposto}
+                        onChange={e => setTituloProposto(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Descrição do TCC</label>
+                      <textarea
+                        className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
+                        value={descricaoProposta}
+                        onChange={e => setDescricaoProposta(e.target.value)}
+                        required
+                        rows={4}
+                      />
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        type="submit"
+                        className="bg-[#2F9E41] text-white px-6 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold shadow"
+                        disabled={loading}
+                      >
+                        Enviar Convite
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAlunoSelecionadoConvite(null)}
+                        className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition shadow"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </Modal>
             <ToastContainer />
           </div>
         ) : (
@@ -495,19 +567,18 @@ if (!response.ok) {
                 <FiEdit2 /> Nova Tarefa
               </button>
             </div>
-            {showNewTask && (
-              <form
-                onSubmit={handleAddTask}
-                className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-xl mx-auto border-2 border-[#2F9E41]"
-              >
+            {/* Modal de criar tarefa */}
+            <Modal open={showNewTask} onClose={() => setShowNewTask(false)}>
+              <form onSubmit={handleAddTask}>
+                <h3 className="text-xl font-bold text-[#2F9E41] mb-4">Nova Tarefa</h3>
                 {addTaskError && (
                   <div className="text-red-600 mb-2">{addTaskError}</div>
                 )}
-                <div className="flex flex-col md:flex-row gap-4 w-full">
+                <div className="flex flex-col gap-3">
                   <input
                     type="text"
                     placeholder="Título da tarefa"
-                    className="border-2 border-[#2F9E41] rounded px-3 py-2 flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
+                    className="border-2 border-[#2F9E41] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     required
@@ -515,13 +586,13 @@ if (!response.ok) {
                   <input
                     type="text"
                     placeholder="Descrição da tarefa"
-                    className="border-2 border-[#2F9E41] rounded px-3 py-2 flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
+                    className="border-2 border-[#2F9E41] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                     value={newTaskDescription}
                     onChange={(e) => setNewTaskDescription(e.target.value)}
                     required
                   />
                   <select
-                    className="border-2 border-[#2F9E41] rounded px-3 py-2 flex-1 min-w-0 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
+                    className="border-2 border-[#2F9E41] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                     value={newTaskStatus}
                     onChange={(e) => setNewTaskStatus(e.target.value)}
                   >
@@ -531,17 +602,21 @@ if (!response.ok) {
                       </option>
                     ))}
                   </select>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <FileUpload file={newTaskFile} setFile={setNewTaskFile} />
+                  <div className="flex gap-2 justify-end mt-2">
                     <button
                       type="submit"
                       className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
-                      disabled={!tccId}
+                      disabled={!tccId || loading}
                     >
                       Adicionar
                     </button>
                     <button
                       type="button"
-                      onClick={() => setShowNewTask(false)}
+                      onClick={() => {
+                        setShowNewTask(false);
+                        setNewTaskFile(null);
+                      }}
                       className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
                     >
                       Cancelar
@@ -549,7 +624,113 @@ if (!response.ok) {
                   </div>
                 </div>
               </form>
-            )}
+            </Modal>
+            {/* Modal de editar tarefa */}
+            <Modal open={editTaskId !== null} onClose={() => setEditTaskId(null)}>
+              <form
+                onSubmit={e => {
+                  e.preventDefault();
+                  handleSaveEditTask(editTaskId);
+                }}
+                className="flex flex-col gap-3"
+              >
+                <h3 className="text-xl font-bold text-[#2F9E41] mb-2">Editar Tarefa</h3>
+                <input
+                  className="border-2 border-[#2F9E41] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
+                  value={editTaskTitle}
+                  onChange={e => setEditTaskTitle(e.target.value)}
+                  required
+                />
+                <input
+                  className="border-2 border-[#2F9E41] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
+                  value={editTaskDescription}
+                  onChange={e => setEditTaskDescription(e.target.value)}
+                  required
+                />
+                <select
+                  className="border-2 border-[#2F9E41] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
+                  value={editTaskStatus}
+                  onChange={e => setEditTaskStatus(e.target.value)}
+                >
+                  {columns.map((col) => (
+                    <option key={col.key} value={col.key}>
+                      {col.label}
+                    </option>
+                  ))}
+                </select>
+                <FileUpload file={editTaskFile} setFile={setEditTaskFile} />
+                <div className="flex gap-2 justify-end mt-2">
+                  <button
+                    type="submit"
+                    className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
+                    disabled={loading}
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditTaskId(null)}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition font-semibold"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </Modal>
+            {/* Modal de descrição da tarefa */}
+            <Modal open={expandedTaskId !== null} onClose={() => setExpandedTaskId(null)}>
+              {tasks.find(t => t.id === expandedTaskId) && (
+                <div>
+                  <h3 className="text-xl font-bold text-[#2F9E41] mb-2">Descrição da Tarefa</h3>
+                  <div className="text-gray-700 mb-4">
+                    {tasks.find(t => t.id === expandedTaskId).descricao || "Sem descrição"}
+                  </div>
+                  {/* Arquivos anexados na modal de descrição */}
+                  {tasks.find(t => t.id === expandedTaskId).arquivos &&
+                    tasks.find(t => t.id === expandedTaskId).arquivos.length > 0 && (
+                      <div className="mb-4">
+                        <div className="font-semibold text-[#2F9E41] mb-1 flex items-center gap-1">
+                          <FiPaperclip /> Arquivos anexados:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {tasks.find(t => t.id === expandedTaskId).arquivos.map((arq) => (
+                            <div
+                              key={arq.id}
+                              className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
+                            >
+                              <FiPaperclip className="text-[#2F9E41]" />
+                              <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{arq.nome_arquivo}</span>
+                              <a
+                                href={`/${arq.caminho_arquivo}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
+                                title="Visualizar arquivo"
+                              >
+                                <FiEye /> Ver
+                              </a>
+                              <a
+                                href={`/${arq.caminho_arquivo}`}
+                                download={arq.nome_arquivo}
+                                className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
+                                title="Baixar arquivo"
+                              >
+                                <FiDownload /> Baixar
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  <button
+                    className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
+                    onClick={() => setExpandedTaskId(null)}
+                  >
+                    Fechar
+                  </button>
+                </div>
+              )}
+            </Modal>
             <DragDropContext onDragEnd={onDragEnd}>
               <div className="flex gap-6 justify-center items-start overflow-x-auto pb-4">
                 {columns.map((col) => {
@@ -592,26 +773,11 @@ if (!response.ok) {
                                         } hover:bg-green-50 transition`}
                                       style={provided.draggableProps.style}
                                       onClick={() =>
-                                        setExpandedTaskId(
-                                          expandedTaskId === task.id ? null : task.id
-                                        )
+                                        setExpandedTaskId(task.id)
                                       }
                                     >
                                       <div className="flex items-center justify-between">
-                                        {editTaskId === task.id ? (
-                                          <input
-                                            className="border-2 border-[#2F9E41] rounded px-2 py-1 flex-1 mr-2 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
-                                            value={editTaskTitle}
-                                            onChange={(e) => setEditTaskTitle(e.target.value)}
-                                            onBlur={() => handleSaveEditTask(task.id)}
-                                            onKeyDown={(e) => {
-                                              if (e.key === "Enter") handleSaveEditTask(task.id);
-                                            }}
-                                            autoFocus
-                                          />
-                                        ) : (
-                                          <span className="font-medium">{task.titulo || task.title}</span>
-                                        )}
+                                        <span className="font-medium">{task.titulo || task.title}</span>
                                         <button
                                           className="ml-2 p-1 rounded hover:bg-gray-200"
                                           onClick={(e) => {
@@ -627,13 +793,19 @@ if (!response.ok) {
                                           <div className="absolute right-2 top-8 z-10 bg-white border rounded shadow flex flex-col min-w-[120px]">
                                             <button
                                               className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm"
-                                              onClick={() => handleEditTask(task.id, task.titulo || task.title)}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditTask(task);
+                                              }}
                                             >
                                               <FiEdit2 /> Editar
                                             </button>
                                             <button
                                               className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 text-sm text-red-600"
-                                              onClick={() => handleDeleteTask(task.id)}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteTask(task.id);
+                                              }}
                                             >
                                               <FiTrash2 /> Excluir
                                             </button>
@@ -645,20 +817,43 @@ if (!response.ok) {
                                           ? dayjs(task.createdAt || task.created_at).format("DD/MM/YYYY HH:mm")
                                           : "Data inválida"}
                                       </span>
+                                      {/* Arquivos da tarefa */}
+                                      {task.arquivos && task.arquivos.length > 0 && (
+                                        <div className="mt-2">
+                                          <div className="font-semibold text-[#2F9E41] mb-1 flex items-center gap-1">
+                                            <FiPaperclip /> Arquivos anexados:
+                                          </div>
+                                          <div className="flex flex-wrap gap-2">
+                                            {task.arquivos.map((arq) => (
+                                              <div
+                                                key={arq.id}
+                                                className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
+                                              >
+                                                <FiPaperclip className="text-[#2F9E41]" />
+                                                <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{arq.nome_arquivo}</span>
+                                                <a
+                                                  href={`/${arq.caminho_arquivo}`}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
+                                                  title="Visualizar arquivo"
+                                                >
+                                                  <FiEye /> Ver
+                                                </a>
+                                                <a
+                                                  href={`/${arq.caminho_arquivo}`}
+                                                  download={arq.nome_arquivo}
+                                                  className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
+                                                  title="Baixar arquivo"
+                                                >
+                                                  <FiDownload /> Baixar
+                                                </a>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
-                                    {/* Modalzinho embaixo do card para descrição */}
-                                    {expandedTaskId === task.id && (
-                                      <div className="bg-white border-2 border-[#2F9E41] rounded-xl shadow p-3 mt-2">
-                                        <div className="font-semibold mb-1 text-[#2F9E41]">Descrição:</div>
-                                        <div className="text-gray-700">{task.descricao || task.description || "Sem descrição"}</div>
-                                        <button
-                                          className="mt-2 text-sm text-[#2F9E41] hover:underline"
-                                          onClick={() => setExpandedTaskId(null)}
-                                        >
-                                          Fechar
-                                        </button>
-                                      </div>
-                                    )}
                                   </div>
                                 )}
                               </Draggable>
