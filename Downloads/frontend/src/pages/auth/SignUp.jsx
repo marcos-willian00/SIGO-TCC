@@ -65,15 +65,15 @@ function Cadastro() {
 
       if (response.ok) {
         toast.success("Cadastro realizado com sucesso!");
-        
+
         // Fazer login automático após cadastro bem-sucedido
         console.log("Fazendo login automático após cadastro...");
         const loginResponse = await loginService(form.email, form.password);
-        
+
         if (loginResponse.success) {
           const user = loginResponse.user;
           console.log("Login automático bem-sucedido:", user);
-          
+
           // Redirecionar baseado no tipo de usuário
           if (user.user_type === "estudante") {
             navigate("/aluno");
@@ -169,9 +169,7 @@ function Cadastro() {
               type="text"
               name="matricula"
               placeholder={
-                form.user_type === "professor"
-                  ? "Siape"
-                  : "Matrícula"
+                form.user_type === "professor" ? "Siape" : "Matrícula"
               }
               value={form.matricula}
               onChange={handleChange}
@@ -238,7 +236,36 @@ function Cadastro() {
             </button>
           </div>
         </form>
-        <ToastContainer />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastClassName={(context) => {
+            // context.type pode ser: "default", "success", "info", "warning", "error"
+            const base =
+              "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+            switch (context?.type) {
+              case "success":
+                return `${base} !bg-[#2F9E41]`; // verde
+              case "error":
+                return `${base} !bg-red-600`;
+              case "info":
+                return `${base} !bg-blue-600`;
+              case "warning":
+                return `${base} !bg-yellow-600 !text-black`;
+              default:
+                return `${base} !bg-[#2F9E41]`;
+            }
+          }}
+          bodyClassName="!text-white"
+        />
       </div>
     </div>
   );

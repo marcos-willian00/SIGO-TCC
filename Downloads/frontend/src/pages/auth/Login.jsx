@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { loginService } from '../../services/AuthService';
-import { ToastContainer, toast } from 'react-toastify';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { loginService } from "../../services/AuthService";
+import { ToastContainer, toast } from "react-toastify";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const navigate = useNavigate();
 
   async function onSubmitLogin() {
@@ -13,37 +13,37 @@ function Login() {
 
     if (!loginResponse.success) {
       // Mensagens específicas baseadas no tipo de erro
-      let errorMessage = '';
+      let errorMessage = "";
       switch (loginResponse.error) {
-        case 'INVALID_CREDENTIALS':
+        case "INVALID_CREDENTIALS":
           errorMessage =
-            'Email ou senha incorretos. Verifique suas credenciais.';
+            "Email ou senha incorretos. Verifique suas credenciais.";
           break;
-        case 'USER_NOT_FOUND':
-          errorMessage = 'Usuário não encontrado. Verifique seu email.';
+        case "USER_NOT_FOUND":
+          errorMessage = "Usuário não encontrado. Verifique seu email.";
           break;
-        case 'USER_DATA_INVALID':
+        case "USER_DATA_INVALID":
           errorMessage =
-            'Dados do usuário inválidos. Entre em contato com o suporte.';
+            "Dados do usuário inválidos. Entre em contato com o suporte.";
           break;
-        case 'VALIDATION_ERROR':
+        case "VALIDATION_ERROR":
           errorMessage =
-            'Dados de login inválidos. Verifique os campos preenchidos.';
+            "Dados de login inválidos. Verifique os campos preenchidos.";
           break;
-        case 'SERVER_ERROR':
+        case "SERVER_ERROR":
           errorMessage =
-            'Erro interno do servidor. Tente novamente mais tarde.';
+            "Erro interno do servidor. Tente novamente mais tarde.";
           break;
-        case 'NETWORK_ERROR':
+        case "NETWORK_ERROR":
           errorMessage =
-            'Erro de conexão. Verifique sua internet e tente novamente.';
+            "Erro de conexão. Verifique sua internet e tente novamente.";
           break;
         default:
           errorMessage =
-            'Erro inesperado. Tente novamente ou entre em contato com o suporte.';
+            "Erro inesperado. Tente novamente ou entre em contato com o suporte.";
       }
 
-      toast(errorMessage, { type: 'error' });
+      toast(errorMessage, { type: "error" });
       return;
     }
 
@@ -52,27 +52,27 @@ function Login() {
     const role = user?.role;
 
     if (!user || !user.id || !user.nome || !tipo) {
-      toast('Dados do usuário incompletos.', { type: 'error' });
+      toast("Dados do usuário incompletos.", { type: "error" });
       return;
     }
 
-    if (tipo === 'estudante') {
-      navigate('/aluno');
-    } else if (tipo === 'professor') {
-      if (role === 'admin') {
-        navigate('/admin');
-      } else if (role === 'coordenador') {
-        navigate('/coordenador');
+    if (tipo === "estudante") {
+      navigate("/aluno");
+    } else if (tipo === "professor") {
+      if (role === "admin") {
+        navigate("/admin");
+      } else if (role === "coordenador") {
+        navigate("/coordenador");
       } else {
-        navigate('/professor');
+        navigate("/professor");
       }
     } else {
-      toast('Tipo de usuário desconhecido.', { type: 'error' });
+      toast("Tipo de usuário desconhecido.", { type: "error" });
       return;
     }
 
-    toast('Login realizado com sucesso!', {
-      type: 'success',
+    toast("Login realizado com sucesso!", {
+      type: "success",
     });
   }
 
@@ -159,7 +159,36 @@ function Login() {
           </form>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        toastClassName={(context) => {
+          // context.type pode ser: "default", "success", "info", "warning", "error"
+          const base =
+            "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+          switch (context?.type) {
+            case "success":
+              return `${base} !bg-[#2F9E41]`; // verde
+            case "error":
+              return `${base} !bg-red-600`;
+            case "info":
+              return `${base} !bg-blue-600`;
+            case "warning":
+              return `${base} !bg-yellow-600 !text-black`;
+            default:
+              return `${base} !bg-[#2F9E41]`;
+          }
+        }}
+        bodyClassName="!text-white"
+      />
     </div>
   );
 }
