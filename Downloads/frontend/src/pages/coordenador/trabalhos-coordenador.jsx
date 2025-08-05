@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { FiUsers, FiEye, FiChevronDown, FiChevronUp, FiBook, FiCalendar, FiUser, FiFileText } from "react-icons/fi";
+import {
+  FiUsers,
+  FiEye,
+  FiChevronDown,
+  FiChevronUp,
+  FiBook,
+  FiCalendar,
+  FiUser,
+  FiFileText,
+} from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import CoordenadorMenu from "./menu-coordenador";
 
@@ -15,17 +24,22 @@ export default function TrabalhosCoordenador() {
       const token = localStorage.getItem("token");
       try {
         setLoading(true);
-        
-        const response = await fetch("http://localhost:8000/coordenador/professores/com-tccs", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
+
+        const response = await fetch(
+          "http://localhost:8000/coordenador/professores/com-tccs",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         if (response.ok) {
           const data = await response.json();
           setProfessores(data);
         } else {
           const errorData = await response.json();
-          toast.error(errorData.detail || "Erro ao carregar professores com TCCs.");
+          toast.error(
+            errorData.detail || "Erro ao carregar professores com TCCs."
+          );
         }
       } catch (err) {
         toast.error("Erro ao conectar com o servidor.");
@@ -34,24 +48,28 @@ export default function TrabalhosCoordenador() {
         setLoading(false);
       }
     }
-    
+
     fetchProfessoresComTccs();
   }, []);
 
   // Filtrar professores pelo termo de busca
-  const professoresFiltrados = professores.filter(professor =>
-    professor.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    professor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    professor.departamento.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    professor.tccs.some(tcc => 
-      tcc.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tcc.estudante?.nome.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const professoresFiltrados = professores.filter(
+    (professor) =>
+      professor.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      professor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      professor.departamento.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      professor.tccs.some(
+        (tcc) =>
+          tcc.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tcc.estudante?.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   // Alternar expansão dos detalhes do professor
   const toggleExpansao = (professorId) => {
-    setExpandedProfessor(expandedProfessor === professorId ? null : professorId);
+    setExpandedProfessor(
+      expandedProfessor === professorId ? null : professorId
+    );
   };
 
   // Função para formatar data
@@ -97,13 +115,47 @@ export default function TrabalhosCoordenador() {
     <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-white">
       <CoordenadorMenu />
       <div className="flex-1 ml-64 px-6 py-8">
+        {/* ToastContainer estilizado global para toda a página */}
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastClassName={(context) => {
+            // context.type pode ser: "default", "success", "info", "warning", "error"
+            const base =
+              "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+            switch (context?.type) {
+              case "success":
+                return `${base} !bg-[#2F9E41]`; // verde
+              case "error":
+                return `${base} !bg-red-600`;
+              case "info":
+                return `${base} !bg-blue-600`;
+              case "warning":
+                return `${base} !bg-yellow-600 !text-black`;
+              default:
+                return `${base} !bg-[#2F9E41]`;
+            }
+          }}
+          bodyClassName="!text-white"
+        />
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-extrabold text-[#2F9E41] mb-6 text-center drop-shadow">
             Trabalhos de Conclusão de Curso
           </h1>
-          
+
           <div className="mb-6 text-center text-gray-600">
-            <p>Acompanhe todos os TCCs em andamento orientados pelos professores do departamento</p>
+            <p>
+              Acompanhe todos os TCCs em andamento orientados pelos professores
+              do departamento
+            </p>
           </div>
 
           {/* Barra de busca */}
@@ -130,13 +182,14 @@ export default function TrabalhosCoordenador() {
               <div className="text-center py-12">
                 <FiBook className="mx-auto h-16 w-16 text-gray-400 mb-4" />
                 <p className="text-xl text-gray-600 mb-2">
-                  {searchTerm ? "Nenhum resultado encontrado" : "Nenhum TCC ativo encontrado"}
+                  {searchTerm
+                    ? "Nenhum resultado encontrado"
+                    : "Nenhum TCC ativo encontrado"}
                 </p>
                 <p className="text-gray-500">
-                  {searchTerm 
-                    ? "Tente ajustar os termos da sua busca" 
-                    : "Não há professores orientando TCCs no momento"
-                  }
+                  {searchTerm
+                    ? "Tente ajustar os termos da sua busca"
+                    : "Não há professores orientando TCCs no momento"}
                 </p>
               </div>
             ) : (
@@ -164,7 +217,7 @@ export default function TrabalhosCoordenador() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                       <div className="text-center">
                         <p className="text-2xl font-bold text-[#2F9E41]">
@@ -174,7 +227,7 @@ export default function TrabalhosCoordenador() {
                           {professor.total_tccs === 1 ? "TCC" : "TCCs"}
                         </p>
                       </div>
-                      
+
                       {expandedProfessor === professor.id ? (
                         <FiChevronUp className="h-6 w-6 text-[#2F9E41]" />
                       ) : (
@@ -197,12 +250,14 @@ export default function TrabalhosCoordenador() {
                                 {tcc.titulo}
                               </h4>
                               <span
-                                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(tcc.status)}`}
+                                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                                  tcc.status
+                                )}`}
                               >
                                 {getStatusText(tcc.status)}
                               </span>
                             </div>
-                            
+
                             {tcc.estudante && (
                               <div className="mb-3 p-3 bg-green-50 rounded-lg">
                                 <div className="flex items-center space-x-2 mb-2">
@@ -222,7 +277,7 @@ export default function TrabalhosCoordenador() {
                                 </p>
                               </div>
                             )}
-                            
+
                             <div className="space-y-2 text-sm text-gray-600">
                               <div className="flex items-center space-x-2">
                                 <FiFileText className="h-4 w-4" />
@@ -231,14 +286,16 @@ export default function TrabalhosCoordenador() {
                               {tcc.descricao && (
                                 <div className="flex items-start space-x-2">
                                   <FiCalendar className="h-4 w-4 mt-0.5" />
-                                  <span className="line-clamp-2">{tcc.descricao}</span>
+                                  <span className="line-clamp-2">
+                                    {tcc.descricao}
+                                  </span>
                                 </div>
                               )}
                             </div>
                           </div>
                         ))}
                       </div>
-                      
+
                       {professor.tccs.length === 0 && (
                         <div className="text-center py-8">
                           <FiBook className="mx-auto h-12 w-12 text-gray-400 mb-2" />
@@ -269,7 +326,10 @@ export default function TrabalhosCoordenador() {
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-2xl font-bold text-green-600">
-                    {professoresFiltrados.reduce((total, prof) => total + prof.total_tccs, 0)}
+                    {professoresFiltrados.reduce(
+                      (total, prof) => total + prof.total_tccs,
+                      0
+                    )}
                   </p>
                   <p className="text-green-800 font-medium">
                     TCCs em Andamento
@@ -277,10 +337,16 @@ export default function TrabalhosCoordenador() {
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-2xl font-bold text-purple-600">
-                    {professoresFiltrados.length > 0 
-                      ? Math.round(professoresFiltrados.reduce((total, prof) => total + prof.total_tccs, 0) / professoresFiltrados.length * 10) / 10
-                      : 0
-                    }
+                    {professoresFiltrados.length > 0
+                      ? Math.round(
+                          (professoresFiltrados.reduce(
+                            (total, prof) => total + prof.total_tccs,
+                            0
+                          ) /
+                            professoresFiltrados.length) *
+                            10
+                        ) / 10
+                      : 0}
                   </p>
                   <p className="text-purple-800 font-medium">
                     Média por Professor
@@ -290,8 +356,8 @@ export default function TrabalhosCoordenador() {
             </div>
           )}
         </div>
-        
-        <ToastContainer />
+
+        {/* ToastContainer removido daqui, agora global acima */}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import api from '../../services/api';
+import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import api from "../../services/api";
 
 const AlunosDepartamento = () => {
   const [alunos, setAlunos] = useState([]);
@@ -8,7 +8,7 @@ const AlunosDepartamento = () => {
   const [cursoInfo, setCursoInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchDados();
@@ -17,22 +17,21 @@ const AlunosDepartamento = () => {
   const fetchDados = async () => {
     try {
       setLoading(true);
-      
+
       // Buscar informações do curso
-      const cursoResponse = await api.get('/coordenador/curso/info');
+      const cursoResponse = await api.get("/coordenador/curso/info");
       setCursoInfo(cursoResponse.data);
-      
+
       // Buscar todos os alunos
-      const todosAlunosResponse = await api.get('/coordenador/alunos');
+      const todosAlunosResponse = await api.get("/coordenador/alunos");
       setAlunos(todosAlunosResponse.data);
-      
+
       // Buscar apenas alunos ativos
-      const alunosAtivosResponse = await api.get('/coordenador/alunos/ativos');
+      const alunosAtivosResponse = await api.get("/coordenador/alunos/ativos");
       setAlunosAtivos(alunosAtivosResponse.data);
-      
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-      toast.error('Erro ao carregar dados dos alunos');
+      console.error("Erro ao carregar dados:", error);
+      toast.error("Erro ao carregar dados dos alunos");
     } finally {
       setLoading(false);
     }
@@ -44,8 +43,8 @@ const AlunosDepartamento = () => {
       toast.success(`Aluno ${nome} foi arquivado com sucesso`);
       fetchDados(); // Recarregar dados
     } catch (error) {
-      console.error('Erro ao arquivar aluno:', error);
-      toast.error('Erro ao arquivar aluno');
+      console.error("Erro ao arquivar aluno:", error);
+      toast.error("Erro ao arquivar aluno");
     }
   };
 
@@ -55,20 +54,35 @@ const AlunosDepartamento = () => {
       toast.success(`Aluno ${nome} foi desarquivado com sucesso`);
       fetchDados(); // Recarregar dados
     } catch (error) {
-      console.error('Erro ao desarquivar aluno:', error);
-      toast.error('Erro ao desarquivar aluno');
+      console.error("Erro ao desarquivar aluno:", error);
+      toast.error("Erro ao desarquivar aluno");
     }
   };
 
-  const filteredAlunos = (showAll ? alunos : alunosAtivos).filter(aluno =>
-    aluno.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    aluno.matricula.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    aluno.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAlunos = (showAll ? alunos : alunosAtivos).filter(
+    (aluno) =>
+      aluno.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      aluno.matricula.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      aluno.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastClassName="!rounded-xl !shadow-lg !font-semibold !text-base !px-6 !py-4 !bg-[#2F9E41] !text-white"
+          bodyClassName="!text-white"
+        />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -76,6 +90,36 @@ const AlunosDepartamento = () => {
 
   return (
     <div className="p-6">
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        toastClassName={(context) => {
+          // context.type pode ser: "default", "success", "info", "warning", "error"
+          const base =
+            "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+          switch (context?.type) {
+            case "success":
+              return `${base} !bg-[#2F9E41]`; // verde
+            case "error":
+              return `${base} !bg-red-600`;
+            case "info":
+              return `${base} !bg-blue-600`;
+            case "warning":
+              return `${base} !bg-yellow-600 !text-black`;
+            default:
+              return `${base} !bg-[#2F9E41]`;
+          }
+        }}
+        bodyClassName="!text-white"
+      />
       {/* Header com informações do curso */}
       {cursoInfo && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -83,7 +127,7 @@ const AlunosDepartamento = () => {
             Alunos do Curso: {cursoInfo.nome_curso}
           </h1>
           <p className="text-gray-600">
-            Coordenador: {cursoInfo.coordenador?.nome || 'Não definido'}
+            Coordenador: {cursoInfo.coordenador?.nome || "Não definido"}
           </p>
         </div>
       )}
@@ -157,7 +201,10 @@ const AlunosDepartamento = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredAlunos.map((aluno) => (
-                  <tr key={aluno.id} className={aluno.arquivado ? 'bg-gray-50' : ''}>
+                  <tr
+                    key={aluno.id}
+                    className={aluno.arquivado ? "bg-gray-50" : ""}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
@@ -179,23 +226,29 @@ const AlunosDepartamento = () => {
                       {aluno.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {aluno.turma || 'Não definida'}
+                      {aluno.turma || "Não definida"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        aluno.arquivado 
-                          ? 'bg-gray-200 text-gray-800' 
-                          : aluno.status === 'ativo'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {aluno.arquivado ? 'Arquivado' : aluno.status || 'Ativo'}
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          aluno.arquivado
+                            ? "bg-gray-200 text-gray-800"
+                            : aluno.status === "ativo"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {aluno.arquivado
+                          ? "Arquivado"
+                          : aluno.status || "Ativo"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       {aluno.arquivado ? (
                         <button
-                          onClick={() => handleDesarquivar(aluno.id, aluno.nome)}
+                          onClick={() =>
+                            handleDesarquivar(aluno.id, aluno.nome)
+                          }
                           className="text-green-600 hover:text-green-900 mr-3"
                         >
                           Desarquivar
@@ -211,7 +264,7 @@ const AlunosDepartamento = () => {
                       <button
                         onClick={() => {
                           // Aqui você pode adicionar funcionalidade para ver detalhes do aluno
-                          console.log('Ver detalhes do aluno:', aluno);
+                          console.log("Ver detalhes do aluno:", aluno);
                         }}
                         className="text-blue-600 hover:text-blue-900"
                       >

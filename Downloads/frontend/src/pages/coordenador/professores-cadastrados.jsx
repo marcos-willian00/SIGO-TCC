@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import api from '../../services/api';
+import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import api from "../../services/api";
 
 const ProfessoresCadastrados = () => {
   const [professores, setProfessores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterRole, setFilterRole] = useState("all");
 
   useEffect(() => {
     fetchProfessores();
@@ -15,49 +15,52 @@ const ProfessoresCadastrados = () => {
   const fetchProfessores = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/coordenador/professores');
+      const response = await api.get("/coordenador/professores");
       setProfessores(response.data);
     } catch (error) {
-      console.error('Erro ao carregar professores:', error);
-      toast.error('Erro ao carregar dados dos professores');
+      console.error("Erro ao carregar professores:", error);
+      toast.error("Erro ao carregar dados dos professores");
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredProfessores = professores.filter(professor => {
-    const matchesSearch = 
+  const filteredProfessores = professores.filter((professor) => {
+    const matchesSearch =
       professor.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       professor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       professor.siape.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (professor.departamento && professor.departamento.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesRole = filterRole === 'all' || professor.role === filterRole;
-    
+      (professor.departamento &&
+        professor.departamento
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()));
+
+    const matchesRole = filterRole === "all" || professor.role === filterRole;
+
     return matchesSearch && matchesRole;
   });
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
-      case 'admin':
-        return 'bg-red-100 text-red-800';
-      case 'coordenador':
-        return 'bg-blue-100 text-blue-800';
-      case 'professor':
-        return 'bg-green-100 text-green-800';
+      case "admin":
+        return "bg-red-100 text-red-800";
+      case "coordenador":
+        return "bg-blue-100 text-blue-800";
+      case "professor":
+        return "bg-green-100 text-green-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getRoleDisplayName = (role) => {
     switch (role) {
-      case 'admin':
-        return 'Administrador';
-      case 'coordenador':
-        return 'Coordenador';
-      case 'professor':
-        return 'Professor';
+      case "admin":
+        return "Administrador";
+      case "coordenador":
+        return "Coordenador";
+      case "professor":
+        return "Professor";
       default:
         return role;
     }
@@ -65,14 +68,44 @@ const ProfessoresCadastrados = () => {
 
   const roleStats = {
     total: professores.length,
-    admin: professores.filter(p => p.role === 'admin').length,
-    coordenador: professores.filter(p => p.role === 'coordenador').length,
-    professor: professores.filter(p => p.role === 'professor').length,
+    admin: professores.filter((p) => p.role === "admin").length,
+    coordenador: professores.filter((p) => p.role === "coordenador").length,
+    professor: professores.filter((p) => p.role === "professor").length,
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastClassName={(context) => {
+            // context.type pode ser: "default", "success", "info", "warning", "error"
+            const base =
+              "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+            switch (context?.type) {
+              case "success":
+                return `${base} !bg-[#2F9E41]`; // verde
+              case "error":
+                return `${base} !bg-red-600`;
+              case "info":
+                return `${base} !bg-blue-600`;
+              case "warning":
+                return `${base} !bg-yellow-600 !text-black`;
+              default:
+                return `${base} !bg-[#2F9E41]`;
+            }
+          }}
+          bodyClassName="!text-white"
+        />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -80,6 +113,36 @@ const ProfessoresCadastrados = () => {
 
   return (
     <div className="p-6">
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        toastClassName={(context) => {
+          // context.type pode ser: "default", "success", "info", "warning", "error"
+          const base =
+            "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+          switch (context?.type) {
+            case "success":
+              return `${base} !bg-[#2F9E41]`; // verde
+            case "error":
+              return `${base} !bg-red-600`;
+            case "info":
+              return `${base} !bg-blue-600`;
+            case "warning":
+              return `${base} !bg-yellow-600 !text-black`;
+            default:
+              return `${base} !bg-[#2F9E41]`;
+          }
+        }}
+        bodyClassName="!text-white"
+      />
       {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">
@@ -95,54 +158,102 @@ const ProfessoresCadastrados = () => {
         <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-gray-500">
           <div className="flex items-center">
             <div className="p-3 bg-gray-100 rounded-lg">
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <svg
+                className="w-6 h-6 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
               </svg>
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-700">{roleStats.total}</div>
+              <div className="text-2xl font-bold text-gray-700">
+                {roleStats.total}
+              </div>
               <div className="text-sm text-gray-600">Total de Professores</div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-green-500">
           <div className="flex items-center">
             <div className="p-3 bg-green-100 rounded-lg">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <svg
+                className="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-green-600">{roleStats.professor}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {roleStats.professor}
+              </div>
               <div className="text-sm text-gray-600">Professores</div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
           <div className="flex items-center">
             <div className="p-3 bg-blue-100 rounded-lg">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
               </svg>
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-blue-600">{roleStats.coordenador}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {roleStats.coordenador}
+              </div>
               <div className="text-sm text-gray-600">Coordenadores</div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-red-500">
           <div className="flex items-center">
             <div className="p-3 bg-red-100 rounded-lg">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-red-600">{roleStats.admin}</div>
+              <div className="text-2xl font-bold text-red-600">
+                {roleStats.admin}
+              </div>
               <div className="text-sm text-gray-600">Administradores</div>
             </div>
           </div>
@@ -156,8 +267,18 @@ const ProfessoresCadastrados = () => {
           <div className="flex-1 max-w-md">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
               <input
@@ -172,7 +293,9 @@ const ProfessoresCadastrados = () => {
 
           {/* Filtro por role */}
           <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-gray-700">Filtrar por:</label>
+            <label className="text-sm font-medium text-gray-700">
+              Filtrar por:
+            </label>
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
@@ -188,7 +311,10 @@ const ProfessoresCadastrados = () => {
 
         {/* Contador de resultados */}
         <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-          <span>Mostrando {filteredProfessores.length} de {professores.length} professores</span>
+          <span>
+            Mostrando {filteredProfessores.length} de {professores.length}{" "}
+            professores
+          </span>
           {searchTerm && (
             <span className="text-blue-600">
               Resultados para: "{searchTerm}"
@@ -201,8 +327,18 @@ const ProfessoresCadastrados = () => {
       <div className="bg-white rounded-lg shadow-md">
         {filteredProfessores.length === 0 ? (
           <div className="p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             <p className="text-gray-500 text-lg">Nenhum professor encontrado</p>
             {searchTerm && (
@@ -223,11 +359,14 @@ const ProfessoresCadastrados = () => {
               <div>Contato</div>
               <div>Ações</div>
             </div>
-            
+
             {/* Lista de professores */}
             <div className="divide-y divide-gray-200">
               {filteredProfessores.map((professor) => (
-                <div key={professor.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div
+                  key={professor.id}
+                  className="p-6 hover:bg-gray-50 transition-colors"
+                >
                   {/* Layout mobile */}
                   <div className="lg:hidden space-y-3">
                     <div className="flex items-center space-x-4">
@@ -237,53 +376,93 @@ const ProfessoresCadastrados = () => {
                         </span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{professor.nome}</h3>
-                        <p className="text-sm text-gray-600">{professor.email}</p>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {professor.nome}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {professor.email}
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-gray-700">SIAPE:</span>
+                        <span className="font-medium text-gray-700">
+                          SIAPE:
+                        </span>
                         <p className="text-gray-600">{professor.siape}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Cargo:</span>
+                        <span className="font-medium text-gray-700">
+                          Cargo:
+                        </span>
                         <div className="mt-1">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(professor.role)}`}>
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(
+                              professor.role
+                            )}`}
+                          >
                             {getRoleDisplayName(professor.role)}
                           </span>
                         </div>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Departamento:</span>
-                        <p className="text-gray-600">{professor.departamento || 'Não informado'}</p>
+                        <span className="font-medium text-gray-700">
+                          Departamento:
+                        </span>
+                        <p className="text-gray-600">
+                          {professor.departamento || "Não informado"}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Titulação:</span>
-                        <p className="text-gray-600">{professor.titulacao || 'Não informado'}</p>
+                        <span className="font-medium text-gray-700">
+                          Titulação:
+                        </span>
+                        <p className="text-gray-600">
+                          {professor.titulacao || "Não informado"}
+                        </p>
                       </div>
                     </div>
-                    
+
                     {(professor.telefone || professor.google_agenda_url) && (
                       <div className="flex flex-wrap gap-2">
                         {professor.telefone && (
                           <div className="flex items-center text-sm text-gray-600">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            <svg
+                              className="w-4 h-4 mr-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                              />
                             </svg>
                             {professor.telefone}
                           </div>
                         )}
                         {professor.google_agenda_url && (
-                          <a 
+                          <a
                             href={professor.google_agenda_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center text-sm text-blue-600 hover:text-blue-800"
                           >
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg
+                              className="w-4 h-4 mr-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
                             </svg>
                             Ver Agenda
                           </a>
@@ -301,49 +480,83 @@ const ProfessoresCadastrados = () => {
                         </span>
                       </div>
                       <div className="ml-3">
-                        <div className="text-sm font-medium text-gray-900">{professor.nome}</div>
-                        <div className="text-sm text-gray-500">{professor.email}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {professor.nome}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {professor.email}
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="text-sm text-gray-900">{professor.siape}</div>
-                    
-                    <div className="text-sm text-gray-900">{professor.departamento || 'Não informado'}</div>
-                    
-                    <div className="text-sm text-gray-900">{professor.titulacao || 'Não informado'}</div>
-                    
+
+                    <div className="text-sm text-gray-900">
+                      {professor.siape}
+                    </div>
+
+                    <div className="text-sm text-gray-900">
+                      {professor.departamento || "Não informado"}
+                    </div>
+
+                    <div className="text-sm text-gray-900">
+                      {professor.titulacao || "Não informado"}
+                    </div>
+
                     <div>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(professor.role)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(
+                          professor.role
+                        )}`}
+                      >
                         {getRoleDisplayName(professor.role)}
                       </span>
                     </div>
-                    
+
                     <div className="space-y-1">
                       {professor.telefone && (
                         <div className="flex items-center text-sm text-gray-600">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          <svg
+                            className="w-4 h-4 mr-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
                           </svg>
                           {professor.telefone}
                         </div>
                       )}
                       {professor.google_agenda_url && (
-                        <a 
+                        <a
                           href={professor.google_agenda_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center text-sm text-blue-600 hover:text-blue-800"
                         >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          <svg
+                            className="w-4 h-4 mr-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
                           </svg>
                           Agenda
                         </a>
                       )}
                     </div>
-                    
+
                     <div className="flex space-x-2">
-                      <a 
+                      <a
                         href={`mailto:${professor.email}`}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >

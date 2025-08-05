@@ -13,9 +13,12 @@ export default function ProfessoresDepartamento() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/coordenador/professores/departamento", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "http://localhost:8000/coordenador/professores/departamento",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setProfessores(data);
@@ -39,17 +42,18 @@ export default function ProfessoresDepartamento() {
       professor.nome.toLowerCase().includes(search.toLowerCase()) ||
       professor.email.toLowerCase().includes(search.toLowerCase()) ||
       professor.siape.toLowerCase().includes(search.toLowerCase()) ||
-      (professor.titulacao && professor.titulacao.toLowerCase().includes(search.toLowerCase()))
+      (professor.titulacao &&
+        professor.titulacao.toLowerCase().includes(search.toLowerCase()))
   );
 
   const getRoleLabel = (role) => {
     switch (role) {
-      case 'COORDENADOR':
-        return 'Coordenador';
-      case 'ADMIN':
-        return 'Administrador';
+      case "COORDENADOR":
+        return "Coordenador";
+      case "ADMIN":
+        return "Administrador";
       default:
-        return 'Professor';
+        return "Professor";
     }
   };
 
@@ -57,9 +61,42 @@ export default function ProfessoresDepartamento() {
     <div className="flex min-h-screen bg-gray-100">
       <CoordenadorMenu />
       <div className="flex-1 ml-64 p-10">
+        {/* ToastContainer estilizado global para toda a página */}
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastClassName={(context) => {
+            // context.type pode ser: "default", "success", "info", "warning", "error"
+            const base =
+              "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+            switch (context?.type) {
+              case "success":
+                return `${base} !bg-[#2F9E41]`; // verde
+              case "error":
+                return `${base} !bg-red-600`;
+              case "info":
+                return `${base} !bg-blue-600`;
+              case "warning":
+                return `${base} !bg-yellow-600 !text-black`;
+              default:
+                return `${base} !bg-[#2F9E41]`;
+            }
+          }}
+          bodyClassName="!text-white"
+        />
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-[#2F9E41]">Professores do Departamento</h1>
+          <h1 className="text-2xl font-bold text-[#2F9E41]">
+            Professores do Departamento
+          </h1>
         </div>
 
         {/* Search */}
@@ -110,8 +147,13 @@ export default function ProfessoresDepartamento() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {professoresFiltrados.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                      {search ? "Nenhum professor encontrado." : "Nenhum professor cadastrado no departamento."}
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      {search
+                        ? "Nenhum professor encontrado."
+                        : "Nenhum professor cadastrado no departamento."}
                     </td>
                   </tr>
                 ) : (
@@ -121,28 +163,38 @@ export default function ProfessoresDepartamento() {
                         <div className="flex items-center">
                           <FiUser className="text-gray-400 mr-3" />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{professor.nome}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {professor.nome}
+                            </div>
                             {professor.telefone && (
-                              <div className="text-sm text-gray-500">{professor.telefone}</div>
+                              <div className="text-sm text-gray-500">
+                                {professor.telefone}
+                              </div>
                             )}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{professor.email}</div>
+                        <div className="text-sm text-gray-900">
+                          {professor.email}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{professor.siape}</div>
+                        <div className="text-sm text-gray-900">
+                          {professor.siape}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{professor.titulacao || 'Não informado'}</div>
+                        <div className="text-sm text-gray-900">
+                          {professor.titulacao || "Não informado"}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            professor.role === 'COORDENADOR' 
-                              ? "bg-purple-100 text-purple-800" 
-                              : professor.role === 'ADMIN'
+                            professor.role === "COORDENADOR"
+                              ? "bg-purple-100 text-purple-800"
+                              : professor.role === "ADMIN"
                               ? "bg-red-100 text-red-800"
                               : "bg-green-100 text-green-800"
                           }`}
@@ -165,7 +217,9 @@ export default function ProfessoresDepartamento() {
               <FiUser className="text-[#2F9E41] text-2xl mr-3" />
               <div>
                 <p className="text-sm text-gray-600">Total de Professores</p>
-                <p className="text-2xl font-bold text-[#2F9E41]">{professores.length}</p>
+                <p className="text-2xl font-bold text-[#2F9E41]">
+                  {professores.length}
+                </p>
               </div>
             </div>
           </div>
@@ -174,7 +228,9 @@ export default function ProfessoresDepartamento() {
               <FiUser className="text-purple-500 text-2xl mr-3" />
               <div>
                 <p className="text-sm text-gray-600">Coordenadores</p>
-                <p className="text-2xl font-bold text-purple-500">{professores.filter(p => p.role === 'COORDENADOR').length}</p>
+                <p className="text-2xl font-bold text-purple-500">
+                  {professores.filter((p) => p.role === "COORDENADOR").length}
+                </p>
               </div>
             </div>
           </div>
@@ -183,13 +239,15 @@ export default function ProfessoresDepartamento() {
               <FiUser className="text-blue-500 text-2xl mr-3" />
               <div>
                 <p className="text-sm text-gray-600">Professores Regulares</p>
-                <p className="text-2xl font-bold text-blue-500">{professores.filter(p => p.role === 'PROFESSOR').length}</p>
+                <p className="text-2xl font-bold text-blue-500">
+                  {professores.filter((p) => p.role === "PROFESSOR").length}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ToastContainer />
+      {/* ToastContainer removido daqui, agora global acima */}
     </div>
   );
 }
