@@ -74,9 +74,12 @@ export default function TarefasProfessor() {
     async function fetchOrientandos() {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch("http://localhost:8000/professors/orientandos", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          "http://localhost:8000/professors/orientandos",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (response.ok) {
           const data = await response.json();
           setAlunos(data);
@@ -98,9 +101,12 @@ export default function TarefasProfessor() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/professors/students", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "http://localhost:8000/professors/students",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setAlunosConvite(data);
@@ -123,7 +129,11 @@ export default function TarefasProfessor() {
 
   // Modal convite: enviar convite
   const handleConvidar = async () => {
-    if (!alunoSelecionadoConvite || !tituloProposto.trim() || !descricaoProposta.trim()) {
+    if (
+      !alunoSelecionadoConvite ||
+      !tituloProposto.trim() ||
+      !descricaoProposta.trim()
+    ) {
       toast.error("Preencha todos os campos!");
       return;
     }
@@ -141,7 +151,7 @@ export default function TarefasProfessor() {
           body: JSON.stringify({
             estudante_id: alunoSelecionadoConvite,
             titulo_proposto: tituloProposto,
-            descricao_proposta: descricaoProposta
+            descricao_proposta: descricaoProposta,
           }),
         }
       );
@@ -179,9 +189,12 @@ export default function TarefasProfessor() {
     if (tccIdAluno) {
       setTccId(tccIdAluno);
       const token = localStorage.getItem("token");
-      const tarefasRes = await fetch(`http://localhost:8000/professors/tccs/${tccIdAluno}/tarefas`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const tarefasRes = await fetch(
+        `http://localhost:8000/professors/tccs/${tccIdAluno}/tarefas`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (tarefasRes.ok) {
         const tarefas = await tarefasRes.json();
         setTasks(tarefas);
@@ -210,26 +223,32 @@ export default function TarefasProfessor() {
 
     // Só atualiza se mudou de coluna (status)
     if (source.droppableId !== destination.droppableId) {
-      const sourceTasks = tasks.filter(t => t.status === source.droppableId)
+      const sourceTasks = tasks
+        .filter((t) => t.status === source.droppableId)
         .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
       const movedTask = sourceTasks[source.index];
 
       // Atualiza status no backend
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`http://localhost:8000/professors/tarefas/${movedTask.id}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: destination.droppableId }),
-        });
+        const response = await fetch(
+          `http://localhost:8000/professors/tarefas/${movedTask.id}/status`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ status: destination.droppableId }),
+          }
+        );
         if (response.ok) {
           const tarefaAtualizada = await response.json();
-          setTasks(tasks.map(t =>
-            t.id === tarefaAtualizada.id ? tarefaAtualizada : t
-          ));
+          setTasks(
+            tasks.map((t) =>
+              t.id === tarefaAtualizada.id ? tarefaAtualizada : t
+            )
+          );
         } else {
           toast.error("Erro ao atualizar status da tarefa.");
         }
@@ -238,7 +257,8 @@ export default function TarefasProfessor() {
       }
     } else {
       // Se só mudou a ordem, atualiza localmente
-      const sourceTasks = tasks.filter(t => t.status === source.droppableId)
+      const sourceTasks = tasks
+        .filter((t) => t.status === source.droppableId)
         .sort((a, b) => tasks.indexOf(a) - tasks.indexOf(b));
       const newColumn = Array.from(sourceTasks);
       const [removed] = newColumn.splice(source.index, 1);
@@ -246,7 +266,7 @@ export default function TarefasProfessor() {
 
       const newTasks = [];
       let i = 0;
-      tasks.forEach(t => {
+      tasks.forEach((t) => {
         if (t.status === source.droppableId) {
           newTasks.push(newColumn[i]);
           i++;
@@ -263,7 +283,9 @@ export default function TarefasProfessor() {
     e.preventDefault();
     setAddTaskError("");
     if (!newTaskTitle.trim() || !tccId) {
-      setAddTaskError("Selecione um aluno com TCC ativo para adicionar tarefa.");
+      setAddTaskError(
+        "Selecione um aluno com TCC ativo para adicionar tarefa."
+      );
       return;
     }
     const token = localStorage.getItem("token");
@@ -275,13 +297,16 @@ export default function TarefasProfessor() {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/professors/tccs/${tccId}/tarefas`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:8000/professors/tccs/${tccId}/tarefas`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
       if (response.ok) {
         const tarefa = await response.json();
         setTasks([...tasks, tarefa]);
@@ -296,7 +321,7 @@ export default function TarefasProfessor() {
         try {
           const error = await response.json();
           errorMsg = error.detail || errorMsg;
-        } catch { }
+        } catch {}
         setAddTaskError(errorMsg);
       }
     } catch (err) {
@@ -311,10 +336,13 @@ export default function TarefasProfessor() {
   const handleDeleteTask = async (id) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:8000/professors/tarefas/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `http://localhost:8000/professors/tarefas/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (response.ok || response.status === 204) {
         setTasks(tasks.filter((t) => t.id !== id));
         setMenuTaskId(null);
@@ -337,17 +365,23 @@ export default function TarefasProfessor() {
 
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:8000/professors/arquivos/${arquivoId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
+      const response = await fetch(
+        `http://localhost:8000/professors/arquivos/${arquivoId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       if (response.ok || response.status === 204) {
         // Atualizar a lista de tarefas para refletir a exclusão do arquivo
         if (alunoSelecionado && tccId) {
-          const tarefasRes = await fetch(`http://localhost:8000/professors/tccs/${tccId}/tarefas`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const tarefasRes = await fetch(
+            `http://localhost:8000/professors/tccs/${tccId}/tarefas`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (tarefasRes.ok) {
             const tarefas = await tarefasRes.json();
             setTasks(tarefas);
@@ -384,13 +418,16 @@ export default function TarefasProfessor() {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/professors/tarefas/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:8000/professors/tarefas/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
       if (response.ok) {
         const tarefaAtualizada = await response.json();
         setTasks(tasks.map((t) => (t.id === id ? tarefaAtualizada : t)));
@@ -424,7 +461,7 @@ export default function TarefasProfessor() {
             type="file"
             id="file-upload"
             className="absolute inset-0 opacity-0 cursor-pointer"
-            onChange={e => setFile(e.target.files[0])}
+            onChange={(e) => setFile(e.target.files[0])}
             accept=".pdf,.docx"
           />
           <label
@@ -447,6 +484,37 @@ export default function TarefasProfessor() {
     <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-white">
       <ProfessorMenu />
       <div className="flex-1 ml-64 px-4 py-8 overflow-x-hidden">
+        {/* ToastContainer estilizado global para toda a página */}
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          toastClassName={(context) => {
+            // context.type pode ser: "default", "success", "info", "warning", "error"
+            const base =
+              "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+            switch (context?.type) {
+              case "success":
+                return `${base} !bg-[#2F9E41]`; // verde
+              case "error":
+                return `${base} !bg-red-600`;
+              case "info":
+                return `${base} !bg-blue-600`;
+              case "warning":
+                return `${base} !bg-yellow-600 !text-black`;
+              default:
+                return `${base} !bg-[#2F9E41]`;
+            }
+          }}
+          bodyClassName="!text-white"
+        />
         {!alunoSelecionado ? (
           <div>
             <h1 className="text-3xl font-extrabold text-[#2F9E41] mb-4 ml-5 text-left drop-shadow">
@@ -463,18 +531,27 @@ export default function TarefasProfessor() {
                 <button
                   key={aluno.id}
                   onClick={() => handleSelecionarAluno(aluno)}
-                  className={`bg-white rounded-xl shadow-lg p-6 w-full flex flex-row items-center justify-between hover:bg-[#D3FFD2] transition border-2 ${aluno.tcc
+                  className={`bg-white rounded-xl shadow-lg p-6 w-full flex flex-row items-center justify-between hover:bg-[#D3FFD2] transition border-2 ${
+                    aluno.tcc
                       ? "border-[#2F9E41]"
                       : "border-gray-200 opacity-70 cursor-not-allowed"
-                    }`}
+                  }`}
                   disabled={!aluno.tcc}
-                  title={!aluno.tcc ? "O aluno ainda não aceitou o convite de orientação." : ""}
+                  title={
+                    !aluno.tcc
+                      ? "O aluno ainda não aceitou o convite de orientação."
+                      : ""
+                  }
                 >
                   <div>
-                    <span className="text-xl font-bold text-[#2F9E41]">{aluno.nome}</span>
+                    <span className="text-xl font-bold text-[#2F9E41]">
+                      {aluno.nome}
+                    </span>
                     <br />
                     <span className="text-gray-500 text-sm mt-2">
-                      {aluno.tcc ? "Ver tarefas" : "Aguardando aceite do convite"}
+                      {aluno.tcc
+                        ? "Ver tarefas"
+                        : "Aguardando aceite do convite"}
                     </span>
                   </div>
                   <FiChevronRight size={32} className="text-[#2F9E41]" />
@@ -484,7 +561,9 @@ export default function TarefasProfessor() {
             {/* Modal de convite */}
             <Modal open={showConvite} onClose={() => setShowConvite(false)}>
               <div>
-                <h2 className="text-2xl font-bold text-[#2F9E41] mb-4">Convidar Aluno</h2>
+                <h2 className="text-2xl font-bold text-[#2F9E41] mb-4">
+                  Convidar Aluno
+                </h2>
                 {!alunoSelecionadoConvite ? (
                   <>
                     <input
@@ -499,26 +578,38 @@ export default function TarefasProfessor() {
                       <table className="min-w-full text-left">
                         <thead>
                           <tr className="bg-[#2F9E41]/10">
-                            <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Nome</th>
-                            <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">Email</th>
+                            <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">
+                              Nome
+                            </th>
+                            <th className="py-2 px-4 border-b font-semibold text-[#2F9E41]">
+                              Email
+                            </th>
                             <th className="py-2 px-4 border-b font-semibold"></th>
                           </tr>
                         </thead>
                         <tbody>
                           {alunosFiltrados.length === 0 ? (
                             <tr>
-                              <td colSpan={3} className="py-4 text-center text-gray-500">
+                              <td
+                                colSpan={3}
+                                className="py-4 text-center text-gray-500"
+                              >
                                 Nenhum aluno encontrado.
                               </td>
                             </tr>
                           ) : (
                             alunosFiltrados.map((aluno) => (
-                              <tr key={aluno.id} className="hover:bg-[#e9ffe7] transition">
+                              <tr
+                                key={aluno.id}
+                                className="hover:bg-[#e9ffe7] transition"
+                              >
                                 <td className="px-4 py-2">{aluno.nome}</td>
                                 <td className="px-4 py-2">{aluno.email}</td>
                                 <td className="px-4 py-2">
                                   <button
-                                    onClick={() => handleSelecionarAlunoConvite(aluno.id)}
+                                    onClick={() =>
+                                      handleSelecionarAlunoConvite(aluno.id)
+                                    }
                                     className="bg-yellow-500 text-white px-4 py-1.5 rounded-lg hover:bg-yellow-600 transition font-semibold shadow"
                                     disabled={loading}
                                   >
@@ -534,27 +625,31 @@ export default function TarefasProfessor() {
                   </>
                 ) : (
                   <form
-                    onSubmit={e => {
+                    onSubmit={(e) => {
                       e.preventDefault();
                       handleConvidar();
                     }}
                   >
                     <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Título do TCC</label>
+                      <label className="block text-sm font-medium mb-1 text-[#2F9E41]">
+                        Título do TCC
+                      </label>
                       <input
                         type="text"
                         className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
                         value={tituloProposto}
-                        onChange={e => setTituloProposto(e.target.value)}
+                        onChange={(e) => setTituloProposto(e.target.value)}
                         required
                       />
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1 text-[#2F9E41]">Descrição do TCC</label>
+                      <label className="block text-sm font-medium mb-1 text-[#2F9E41]">
+                        Descrição do TCC
+                      </label>
                       <textarea
                         className="border-2 border-[#2F9E41] rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#2F9E41] shadow-sm"
                         value={descricaoProposta}
-                        onChange={e => setDescricaoProposta(e.target.value)}
+                        onChange={(e) => setDescricaoProposta(e.target.value)}
                         required
                         rows={4}
                       />
@@ -579,7 +674,7 @@ export default function TarefasProfessor() {
                 )}
               </div>
             </Modal>
-            <ToastContainer />
+            <ToastContainer theme="colored" />
           </div>
         ) : (
           <div>
@@ -597,7 +692,11 @@ export default function TarefasProfessor() {
                 onClick={() => setShowNewTask(true)}
                 className="flex items-center gap-2 bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold shadow"
                 disabled={!tccId}
-                title={!tccId ? "O aluno ainda não aceitou o convite de orientação." : ""}
+                title={
+                  !tccId
+                    ? "O aluno ainda não aceitou o convite de orientação."
+                    : ""
+                }
               >
                 <FiEdit2 /> Nova Tarefa
               </button>
@@ -605,7 +704,9 @@ export default function TarefasProfessor() {
             {/* Modal de criar tarefa */}
             <Modal open={showNewTask} onClose={() => setShowNewTask(false)}>
               <form onSubmit={handleAddTask}>
-                <h3 className="text-xl font-bold text-[#2F9E41] mb-4">Nova Tarefa</h3>
+                <h3 className="text-xl font-bold text-[#2F9E41] mb-4">
+                  Nova Tarefa
+                </h3>
                 {addTaskError && (
                   <div className="text-red-600 mb-2">{addTaskError}</div>
                 )}
@@ -661,31 +762,36 @@ export default function TarefasProfessor() {
               </form>
             </Modal>
             {/* Modal de editar tarefa */}
-            <Modal open={editTaskId !== null} onClose={() => setEditTaskId(null)}>
+            <Modal
+              open={editTaskId !== null}
+              onClose={() => setEditTaskId(null)}
+            >
               <form
-                onSubmit={e => {
+                onSubmit={(e) => {
                   e.preventDefault();
                   handleSaveEditTask(editTaskId);
                 }}
                 className="flex flex-col gap-3"
               >
-                <h3 className="text-xl font-bold text-[#2F9E41] mb-2">Editar Tarefa</h3>
+                <h3 className="text-xl font-bold text-[#2F9E41] mb-2">
+                  Editar Tarefa
+                </h3>
                 <input
                   className="border-2 border-[#2F9E41] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                   value={editTaskTitle}
-                  onChange={e => setEditTaskTitle(e.target.value)}
+                  onChange={(e) => setEditTaskTitle(e.target.value)}
                   required
                 />
                 <input
                   className="border-2 border-[#2F9E41] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                   value={editTaskDescription}
-                  onChange={e => setEditTaskDescription(e.target.value)}
+                  onChange={(e) => setEditTaskDescription(e.target.value)}
                   required
                 />
                 <select
                   className="border-2 border-[#2F9E41] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2F9E41]"
                   value={editTaskStatus}
-                  onChange={e => setEditTaskStatus(e.target.value)}
+                  onChange={(e) => setEditTaskStatus(e.target.value)}
                 >
                   {columns.map((col) => (
                     <option key={col.key} value={col.key}>
@@ -693,53 +799,59 @@ export default function TarefasProfessor() {
                     </option>
                   ))}
                 </select>
-                
+
                 {/* Mostrar arquivos existentes */}
-                {editTaskId && tasks.find(t => t.id === editTaskId)?.arquivos && 
-                 tasks.find(t => t.id === editTaskId).arquivos.length > 0 && (
-                  <div className="mb-4">
-                    <div className="font-semibold text-[#2F9E41] mb-2 flex items-center gap-1">
-                      <FiPaperclip /> Arquivos anexados:
+                {editTaskId &&
+                  tasks.find((t) => t.id === editTaskId)?.arquivos &&
+                  tasks.find((t) => t.id === editTaskId).arquivos.length >
+                    0 && (
+                    <div className="mb-4">
+                      <div className="font-semibold text-[#2F9E41] mb-2 flex items-center gap-1">
+                        <FiPaperclip /> Arquivos anexados:
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {tasks
+                          .find((t) => t.id === editTaskId)
+                          .arquivos.map((arq) => (
+                            <div
+                              key={arq.id}
+                              className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
+                            >
+                              <FiPaperclip className="text-[#2F9E41]" />
+                              <span className="text-sm font-medium text-gray-700 truncate flex-1">
+                                {arq.nome_arquivo}
+                              </span>
+                              <a
+                                href={`http://localhost:8000/${arq.caminho_arquivo}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
+                                title="Visualizar arquivo"
+                              >
+                                <FiEye /> Ver
+                              </a>
+                              <a
+                                href={`http://localhost:8000/${arq.caminho_arquivo}`}
+                                download={arq.nome_arquivo}
+                                className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
+                                title="Baixar arquivo"
+                              >
+                                <FiDownload /> Baixar
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteFile(arq.id)}
+                                className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs font-semibold transition"
+                                title="Excluir arquivo"
+                              >
+                                <FiTrash2 /> Excluir
+                              </button>
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      {tasks.find(t => t.id === editTaskId).arquivos.map((arq) => (
-                        <div
-                          key={arq.id}
-                          className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
-                        >
-                          <FiPaperclip className="text-[#2F9E41]" />
-                          <span className="text-sm font-medium text-gray-700 truncate flex-1">{arq.nome_arquivo}</span>
-                          <a
-                            href={`http://localhost:8000/${arq.caminho_arquivo}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
-                            title="Visualizar arquivo"
-                          >
-                            <FiEye /> Ver
-                          </a>
-                          <a
-                            href={`http://localhost:8000/${arq.caminho_arquivo}`}
-                            download={arq.nome_arquivo}
-                            className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
-                            title="Baixar arquivo"
-                          >
-                            <FiDownload /> Baixar
-                          </a>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteFile(arq.id)}
-                            className="flex items-center gap-1 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs font-semibold transition"
-                            title="Excluir arquivo"
-                          >
-                            <FiTrash2 /> Excluir
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
+                  )}
+
                 <FileUpload file={editTaskFile} setFile={setEditTaskFile} />
                 <div className="flex gap-2 justify-end mt-2">
                   <button
@@ -760,53 +872,64 @@ export default function TarefasProfessor() {
               </form>
             </Modal>
             {/* Modal de descrição da tarefa */}
-            <Modal open={expandedTaskId !== null} onClose={() => setExpandedTaskId(null)}>
-              {tasks.find(t => t.id === expandedTaskId) && (
+            <Modal
+              open={expandedTaskId !== null}
+              onClose={() => setExpandedTaskId(null)}
+            >
+              {tasks.find((t) => t.id === expandedTaskId) && (
                 <div>
-                  <h3 className="text-xl font-bold text-[#2F9E41] mb-2">Descrição da Tarefa</h3>
+                  <h3 className="text-xl font-bold text-[#2F9E41] mb-2">
+                    Descrição da Tarefa
+                  </h3>
                   <div className="text-gray-700 mb-4">
-                    {tasks.find(t => t.id === expandedTaskId).descricao || "Sem descrição"}
+                    {tasks.find((t) => t.id === expandedTaskId).descricao ||
+                      "Sem descrição"}
                   </div>
                   {/* Arquivos anexados na modal de descrição */}
-                  {tasks.find(t => t.id === expandedTaskId).arquivos &&
-                    tasks.find(t => t.id === expandedTaskId).arquivos.length > 0 && (
+                  {tasks.find((t) => t.id === expandedTaskId).arquivos &&
+                    tasks.find((t) => t.id === expandedTaskId).arquivos.length >
+                      0 && (
                       <div className="mb-4">
                         <div className="font-semibold text-[#2F9E41] mb-1 flex items-center gap-1">
                           <FiPaperclip /> Arquivos anexados:
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {tasks.find(t => t.id === expandedTaskId).arquivos.map((arq) => (
-                            <div
-                              key={arq.id}
-                              className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
-                            >
-                              <FiPaperclip className="text-[#2F9E41]" />
-                              <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{arq.nome_arquivo}</span>
-                              <a
-                                href={`http://localhost:8000/${arq.caminho_arquivo}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
-                                title="Visualizar arquivo"
+                          {tasks
+                            .find((t) => t.id === expandedTaskId)
+                            .arquivos.map((arq) => (
+                              <div
+                                key={arq.id}
+                                className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
                               >
-                                <FiEye /> Ver
-                              </a>
-                              <a
-                                href={`http://localhost:8000/${arq.caminho_arquivo}`}
-                                download={arq.nome_arquivo}
-                                className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
-                                title="Baixar arquivo"
-                              >
-                                <FiDownload /> Baixar
-                              </a>
-                            </div>
-                          ))}
+                                <FiPaperclip className="text-[#2F9E41]" />
+                                <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+                                  {arq.nome_arquivo}
+                                </span>
+                                <a
+                                  href={`http://localhost:8000/${arq.caminho_arquivo}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
+                                  title="Visualizar arquivo"
+                                >
+                                  <FiEye /> Ver
+                                </a>
+                                <a
+                                  href={`http://localhost:8000/${arq.caminho_arquivo}`}
+                                  download={arq.nome_arquivo}
+                                  className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
+                                  title="Baixar arquivo"
+                                >
+                                  <FiDownload /> Baixar
+                                </a>
+                              </div>
+                            ))}
                         </div>
                       </div>
                     )}
                   <button
                     className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold"
-                    onClick={() => setExpandedTaskId(null)}
+                    // onClick={() => setExpandedTaskId(null)}
                   >
                     Fechar
                   </button>
@@ -825,46 +948,61 @@ export default function TarefasProfessor() {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`bg-white rounded-2xl shadow-xl min-w-[210px] max-w-xs flex flex-col transition-all h-full border-2 ${snapshot.isDraggingOver ? "bg-green-50 border-[#2F9E41]" : "border-gray-200"
-                            }`}
+                          className={`bg-white rounded-2xl shadow-xl min-w-[210px] max-w-xs flex flex-col transition-all h-full border-2 ${
+                            snapshot.isDraggingOver
+                              ? "bg-green-50 border-[#2F9E41]"
+                              : "border-gray-200"
+                          }`}
                         >
                           <div
-                            className={`p-4 font-bold text-lg text-center border-b ${col.key === "a_fazer"
+                            className={`p-4 font-bold text-lg text-center border-b ${
+                              col.key === "a_fazer"
                                 ? "text-red-600"
                                 : col.key === "fazendo"
-                                  ? "text-yellow-600"
-                                  : col.key === "revisar"
-                                    ? "text-blue-600"
-                                    : col.key === "feita"
-                                      ? "text-green-600"
-                                      : "text-gray-600"
-                              }`}
+                                ? "text-yellow-600"
+                                : col.key === "revisar"
+                                ? "text-blue-600"
+                                : col.key === "feita"
+                                ? "text-green-600"
+                                : "text-gray-600"
+                            }`}
                           >
                             {col.label}
                           </div>
                           <div className="flex-1 p-2 space-y-3 min-h-[60px]">
                             {columnTasks.map((task, idx) => (
-                              <Draggable draggableId={task.id.toString()} index={idx} key={task.id}>
+                              <Draggable
+                                draggableId={task.id.toString()}
+                                index={idx}
+                                key={task.id}
+                              >
                                 {(provided, snapshot) => (
                                   <div key={task.id}>
                                     <div
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className={`bg-gray-100 rounded-xl p-3 shadow flex flex-col gap-2 relative border ${snapshot.isDragging ? "ring-2 ring-green-400 border-[#2F9E41]" : "border-gray-200"
-                                        } hover:bg-green-50 transition`}
+                                      className={`bg-gray-100 rounded-xl p-3 shadow flex flex-col gap-2 relative border ${
+                                        snapshot.isDragging
+                                          ? "ring-2 ring-green-400 border-[#2F9E41]"
+                                          : "border-gray-200"
+                                      } hover:bg-green-50 transition`}
                                       style={provided.draggableProps.style}
-                                      onClick={() =>
-                                        setExpandedTaskId(task.id)
-                                      }
+                                      // onClick={() => setExpandedTaskId(task.id)}
                                     >
                                       <div className="flex items-center justify-between">
-                                        <span className="font-medium">{task.titulo || task.title}</span>
+                                        <span className="font-medium">
+                                          {task.titulo || task.title}
+                                        </span>
                                         <button
                                           className="ml-2 p-1 rounded hover:bg-gray-200"
                                           onClick={(e) => {
                                             e.stopPropagation();
-                                            setMenuTaskId(menuTaskId === task.id ? null : task.id);
+                                            setMenuTaskId(
+                                              menuTaskId === task.id
+                                                ? null
+                                                : task.id
+                                            );
                                           }}
                                           tabIndex={0}
                                           type="button"
@@ -895,46 +1033,54 @@ export default function TarefasProfessor() {
                                         )}
                                       </div>
                                       <span className="text-xs text-gray-500 mt-1">
-                                        Criada em: {dayjs(task.createdAt || task.created_at).isValid()
-                                          ? dayjs(task.createdAt || task.created_at).format("DD/MM/YYYY HH:mm")
+                                        Criada em:{" "}
+                                        {dayjs(
+                                          task.createdAt || task.created_at
+                                        ).isValid()
+                                          ? dayjs(
+                                              task.createdAt || task.created_at
+                                            ).format("DD/MM/YYYY HH:mm")
                                           : "Data inválida"}
                                       </span>
                                       {/* Arquivos da tarefa */}
-                                      {task.arquivos && task.arquivos.length > 0 && (
-                                        <div className="mt-2">
-                                          <div className="font-semibold text-[#2F9E41] mb-1 flex items-center gap-1">
-                                            <FiPaperclip /> Arquivos anexados:
-                                          </div>
-                                          <div className="flex flex-wrap gap-2">
-                                            {task.arquivos.map((arq) => (
-                                              <div
-                                                key={arq.id}
-                                                className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
-                                              >
-                                                <FiPaperclip className="text-[#2F9E41]" />
-                                                <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{arq.nome_arquivo}</span>
-                                                <a
-                                                  href={`http://localhost:8000/${arq.caminho_arquivo}`}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
-                                                  title="Visualizar arquivo"
+                                      {task.arquivos &&
+                                        task.arquivos.length > 0 && (
+                                          <div className="mt-2">
+                                            <div className="font-semibold text-[#2F9E41] mb-1 flex items-center gap-1">
+                                              <FiPaperclip /> Arquivos anexados:
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                              {task.arquivos.map((arq) => (
+                                                <div
+                                                  key={arq.id}
+                                                  className="flex items-center gap-2 bg-[#e9ffe7] border border-[#2F9E41]/30 rounded-lg px-3 py-2 shadow-sm"
                                                 >
-                                                  <FiEye />
-                                                </a>
-                                                <a
-                                                  href={`http://localhost:8000/${arq.caminho_arquivo}`}
-                                                  download={arq.nome_arquivo}
-                                                  className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
-                                                  title="Baixar arquivo"
-                                                >
-                                                  <FiDownload /> 
-                                                </a>
-                                              </div>
-                                            ))}
+                                                  <FiPaperclip className="text-[#2F9E41]" />
+                                                  <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+                                                    {arq.nome_arquivo}
+                                                  </span>
+                                                  <a
+                                                    href={`http://localhost:8000/${arq.caminho_arquivo}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
+                                                    title="Visualizar arquivo"
+                                                  >
+                                                    <FiEye />
+                                                  </a>
+                                                  <a
+                                                    href={`http://localhost:8000/${arq.caminho_arquivo}`}
+                                                    download={arq.nome_arquivo}
+                                                    className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
+                                                    title="Baixar arquivo"
+                                                  >
+                                                    <FiDownload />
+                                                  </a>
+                                                </div>
+                                              ))}
+                                            </div>
                                           </div>
-                                        </div>
-                                      )}
+                                        )}
                                     </div>
                                   </div>
                                 )}
@@ -942,7 +1088,9 @@ export default function TarefasProfessor() {
                             ))}
                             {provided.placeholder}
                             {columnTasks.length === 0 && (
-                              <div className="text-gray-400 text-center text-sm">Sem tarefas</div>
+                              <div className="text-gray-400 text-center text-sm">
+                                Sem tarefas
+                              </div>
                             )}
                           </div>
                         </div>
@@ -954,7 +1102,7 @@ export default function TarefasProfessor() {
             </DragDropContext>
           </div>
         )}
-        <ToastContainer />
+        {/* ToastContainer removido daqui, agora global acima */}
       </div>
     </div>
   );

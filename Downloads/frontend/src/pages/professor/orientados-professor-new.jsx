@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import ProfessorMenu from "../../components/SidebarProfessor";
-import { 
-  FiUser, 
-  FiMail, 
-  FiBook, 
-  FiCalendar, 
-  FiPlus, 
-  FiSearch, 
-  FiEye, 
-  FiChevronDown, 
-  FiChevronUp, 
-  FiFileText, 
-  FiPhone, 
-  FiUsers, 
-  FiClock 
+import {
+  FiUser,
+  FiMail,
+  FiBook,
+  FiCalendar,
+  FiPlus,
+  FiSearch,
+  FiEye,
+  FiChevronDown,
+  FiChevronUp,
+  FiFileText,
+  FiPhone,
+  FiUsers,
+  FiClock,
 } from "react-icons/fi";
 
 export default function OrientadosProfessor() {
@@ -39,9 +39,12 @@ export default function OrientadosProfessor() {
     setCarregando(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/professors/me/orientandos", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "http://localhost:8000/professors/me/orientandos",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setOrientandos(data);
@@ -56,15 +59,20 @@ export default function OrientadosProfessor() {
   };
 
   // Filtrar orientandos
-  const orientandosFiltrados = orientandos.filter((orientando) =>
-    orientando.nome?.toLowerCase().includes(buscaOrientando.toLowerCase()) ||
-    orientando.email?.toLowerCase().includes(buscaOrientando.toLowerCase()) ||
-    orientando.matricula?.toLowerCase().includes(buscaOrientando.toLowerCase())
+  const orientandosFiltrados = orientandos.filter(
+    (orientando) =>
+      orientando.nome?.toLowerCase().includes(buscaOrientando.toLowerCase()) ||
+      orientando.email?.toLowerCase().includes(buscaOrientando.toLowerCase()) ||
+      orientando.matricula
+        ?.toLowerCase()
+        .includes(buscaOrientando.toLowerCase())
   );
 
   // Alternar expansão dos detalhes do orientando
   const toggleExpansao = (orientandoId) => {
-    setExpandedOrientando(expandedOrientando === orientandoId ? null : orientandoId);
+    setExpandedOrientando(
+      expandedOrientando === orientandoId ? null : orientandoId
+    );
   };
 
   // Função para obter cor do status
@@ -109,9 +117,12 @@ export default function OrientadosProfessor() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/professors/students", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "http://localhost:8000/professors/students",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         setAlunos(data);
@@ -134,7 +145,11 @@ export default function OrientadosProfessor() {
 
   // Enviar convite para aluno ser orientado
   const handleConvidar = async () => {
-    if (!alunoSelecionado || !tituloProposto.trim() || !descricaoProposta.trim()) {
+    if (
+      !alunoSelecionado ||
+      !tituloProposto.trim() ||
+      !descricaoProposta.trim()
+    ) {
       toast.error("Preencha todos os campos!");
       return;
     }
@@ -152,7 +167,7 @@ export default function OrientadosProfessor() {
           body: JSON.stringify({
             estudante_id: alunoSelecionado,
             titulo_proposto: tituloProposto,
-            descricao_proposta: descricaoProposta
+            descricao_proposta: descricaoProposta,
           }),
         }
       );
@@ -191,26 +206,40 @@ export default function OrientadosProfessor() {
                     <FiUsers className="h-8 w-8 text-indigo-600" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Meus Orientandos</h1>
-                    <p className="text-gray-600">Gerencie seus alunos orientandos e seus projetos de TCC</p>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      Meus Orientandos
+                    </h1>
+                    <p className="text-gray-600">
+                      Gerencie seus alunos orientandos e seus projetos de TCC
+                    </p>
                   </div>
                 </div>
-                
+
                 {/* Estatísticas */}
                 <div className="flex gap-6">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-indigo-600">{orientandos.length}</p>
+                    <p className="text-2xl font-bold text-indigo-600">
+                      {orientandos.length}
+                    </p>
                     <p className="text-sm text-gray-600">Total</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-green-600">
-                      {orientandos.filter(o => o.tcc && o.tcc.status === 'concluido').length}
+                      {
+                        orientandos.filter(
+                          (o) => o.tcc && o.tcc.status === "concluido"
+                        ).length
+                      }
                     </p>
                     <p className="text-sm text-gray-600">Concluídos</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-blue-600">
-                      {orientandos.filter(o => o.tcc && o.tcc.status === 'em_andamento').length}
+                      {
+                        orientandos.filter(
+                          (o) => o.tcc && o.tcc.status === "em_andamento"
+                        ).length
+                      }
                     </p>
                     <p className="text-sm text-gray-600">Em Andamento</p>
                   </div>
@@ -231,7 +260,7 @@ export default function OrientadosProfessor() {
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
-                
+
                 <button
                   onClick={handleAbrirConvite}
                   className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
@@ -247,16 +276,22 @@ export default function OrientadosProfessor() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Carregando orientandos...</p>
+                  <p className="mt-2 text-gray-600">
+                    Carregando orientandos...
+                  </p>
                 </div>
               </div>
             ) : orientandosFiltrados.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <div className="text-center">
                   <FiUsers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum orientando encontrado</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Nenhum orientando encontrado
+                  </h3>
                   <p className="text-gray-600 mb-4">
-                    {buscaOrientando ? 'Tente ajustar sua busca.' : 'Você ainda não possui orientandos.'}
+                    {buscaOrientando
+                      ? "Tente ajustar sua busca."
+                      : "Você ainda não possui orientandos."}
                   </p>
                   {!buscaOrientando && (
                     <button
@@ -272,7 +307,10 @@ export default function OrientadosProfessor() {
             ) : (
               <div className="space-y-4">
                 {orientandosFiltrados.map((orientando) => (
-                  <div key={orientando.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div
+                    key={orientando.id}
+                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                  >
                     {/* Card Header */}
                     <div className="p-6">
                       <div className="flex items-center justify-between">
@@ -281,7 +319,9 @@ export default function OrientadosProfessor() {
                             <FiUser className="h-6 w-6 text-white" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900">{orientando.nome}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {orientando.nome}
+                            </h3>
                             <div className="flex items-center gap-4 mt-1">
                               <span className="text-sm text-gray-600 flex items-center gap-1">
                                 <FiMail className="h-3 w-3" />
@@ -296,10 +336,14 @@ export default function OrientadosProfessor() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-3">
                           {orientando.tcc && (
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(orientando.tcc.status)}`}>
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                                orientando.tcc.status
+                              )}`}
+                            >
                               {getStatusText(orientando.tcc.status)}
                             </span>
                           )}
@@ -327,25 +371,40 @@ export default function OrientadosProfessor() {
                               <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-3">
                                   <FiBook className="h-5 w-5 text-indigo-600" />
-                                  <h4 className="font-semibold text-gray-900">Informações do TCC</h4>
+                                  <h4 className="font-semibold text-gray-900">
+                                    Informações do TCC
+                                  </h4>
                                 </div>
-                                
+
                                 <div>
-                                  <label className="text-sm font-medium text-gray-700">Título:</label>
-                                  <p className="text-gray-900 mt-1">{orientando.tcc.titulo}</p>
-                                </div>
-                                
-                                <div>
-                                  <label className="text-sm font-medium text-gray-700">Descrição:</label>
-                                  <p className="text-gray-600 mt-1 text-sm leading-relaxed">
-                                    {orientando.tcc.descricao || 'Nenhuma descrição disponível'}
+                                  <label className="text-sm font-medium text-gray-700">
+                                    Título:
+                                  </label>
+                                  <p className="text-gray-900 mt-1">
+                                    {orientando.tcc.titulo}
                                   </p>
                                 </div>
-                                
+
                                 <div>
-                                  <label className="text-sm font-medium text-gray-700">Status:</label>
+                                  <label className="text-sm font-medium text-gray-700">
+                                    Descrição:
+                                  </label>
+                                  <p className="text-gray-600 mt-1 text-sm leading-relaxed">
+                                    {orientando.tcc.descricao ||
+                                      "Nenhuma descrição disponível"}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <label className="text-sm font-medium text-gray-700">
+                                    Status:
+                                  </label>
                                   <div className="mt-1">
-                                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(orientando.tcc.status)}`}>
+                                    <span
+                                      className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                                        orientando.tcc.status
+                                      )}`}
+                                    >
                                       {getStatusText(orientando.tcc.status)}
                                     </span>
                                   </div>
@@ -356,33 +415,53 @@ export default function OrientadosProfessor() {
                               <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-3">
                                   <FiUser className="h-5 w-5 text-green-600" />
-                                  <h4 className="font-semibold text-gray-900">Dados do Aluno</h4>
+                                  <h4 className="font-semibold text-gray-900">
+                                    Dados do Aluno
+                                  </h4>
                                 </div>
-                                
+
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Nome Completo:</label>
-                                    <p className="text-gray-900 mt-1">{orientando.nome}</p>
+                                    <label className="text-sm font-medium text-gray-700">
+                                      Nome Completo:
+                                    </label>
+                                    <p className="text-gray-900 mt-1">
+                                      {orientando.nome}
+                                    </p>
                                   </div>
-                                  
+
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Email:</label>
-                                    <p className="text-gray-900 mt-1 break-all">{orientando.email}</p>
+                                    <label className="text-sm font-medium text-gray-700">
+                                      Email:
+                                    </label>
+                                    <p className="text-gray-900 mt-1 break-all">
+                                      {orientando.email}
+                                    </p>
                                   </div>
-                                  
+
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Matrícula:</label>
-                                    <p className="text-gray-900 mt-1">{orientando.matricula}</p>
+                                    <label className="text-sm font-medium text-gray-700">
+                                      Matrícula:
+                                    </label>
+                                    <p className="text-gray-900 mt-1">
+                                      {orientando.matricula}
+                                    </p>
                                   </div>
-                                  
+
                                   <div>
-                                    <label className="text-sm font-medium text-gray-700">Turma:</label>
-                                    <p className="text-gray-900 mt-1">{orientando.turma}</p>
+                                    <label className="text-sm font-medium text-gray-700">
+                                      Turma:
+                                    </label>
+                                    <p className="text-gray-900 mt-1">
+                                      {orientando.turma}
+                                    </p>
                                   </div>
-                                  
+
                                   {orientando.telefone && (
                                     <div>
-                                      <label className="text-sm font-medium text-gray-700">Telefone:</label>
+                                      <label className="text-sm font-medium text-gray-700">
+                                        Telefone:
+                                      </label>
                                       <p className="text-gray-900 mt-1 flex items-center gap-1">
                                         <FiPhone className="h-3 w-3" />
                                         {orientando.telefone}
@@ -399,21 +478,30 @@ export default function OrientadosProfessor() {
                                 TCC não iniciado
                               </h4>
                               <p className="text-gray-600 mb-4">
-                                Este orientando ainda não possui um TCC cadastrado.
+                                Este orientando ainda não possui um TCC
+                                cadastrado.
                               </p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
                                 <div>
-                                  <label className="text-sm font-medium text-gray-700">Email:</label>
-                                  <p className="text-gray-900 mt-1">{orientando.email}</p>
+                                  <label className="text-sm font-medium text-gray-700">
+                                    Email:
+                                  </label>
+                                  <p className="text-gray-900 mt-1">
+                                    {orientando.email}
+                                  </p>
                                 </div>
                                 <div>
-                                  <label className="text-sm font-medium text-gray-700">Matrícula:</label>
-                                  <p className="text-gray-900 mt-1">{orientando.matricula}</p>
+                                  <label className="text-sm font-medium text-gray-700">
+                                    Matrícula:
+                                  </label>
+                                  <p className="text-gray-900 mt-1">
+                                    {orientando.matricula}
+                                  </p>
                                 </div>
                               </div>
                             </div>
                           )}
-                          
+
                           {/* Ações */}
                           <div className="mt-6 pt-4 border-t border-gray-200">
                             <div className="flex justify-end gap-3">
@@ -443,9 +531,11 @@ export default function OrientadosProfessor() {
         <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
-              <h3 className="text-xl font-semibold text-white">Convidar Aluno para Orientação</h3>
+              <h3 className="text-xl font-semibold text-white">
+                Convidar Aluno para Orientação
+              </h3>
             </div>
-            
+
             <div className="p-6 max-h-[calc(90vh-8rem)] overflow-y-auto">
               {/* Campos de Título e Descrição */}
               <div className="mb-6 space-y-4">
@@ -461,7 +551,7 @@ export default function OrientadosProfessor() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Descrição da Proposta *
@@ -502,7 +592,9 @@ export default function OrientadosProfessor() {
                   {loading ? (
                     <div className="p-4 text-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
-                      <p className="mt-2 text-sm text-gray-600">Carregando alunos...</p>
+                      <p className="mt-2 text-sm text-gray-600">
+                        Carregando alunos...
+                      </p>
                     </div>
                   ) : alunosFiltrados.length === 0 ? (
                     <div className="p-4 text-center text-gray-500">
@@ -514,24 +606,33 @@ export default function OrientadosProfessor() {
                         key={aluno.id}
                         onClick={() => handleSelecionarAluno(aluno.id)}
                         className={`p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-                          alunoSelecionado === aluno.id ? 'bg-indigo-50 border-indigo-200' : ''
+                          alunoSelecionado === aluno.id
+                            ? "bg-indigo-50 border-indigo-200"
+                            : ""
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                            alunoSelecionado === aluno.id 
-                              ? 'border-indigo-600 bg-indigo-600' 
-                              : 'border-gray-300'
-                          }`}>
+                          <div
+                            className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                              alunoSelecionado === aluno.id
+                                ? "border-indigo-600 bg-indigo-600"
+                                : "border-gray-300"
+                            }`}
+                          >
                             {alunoSelecionado === aluno.id && (
                               <div className="w-2 h-2 bg-white rounded-full"></div>
                             )}
                           </div>
                           <div className="flex-1">
-                            <p className="font-medium text-gray-900">{aluno.nome}</p>
-                            <p className="text-sm text-gray-600">{aluno.email}</p>
+                            <p className="font-medium text-gray-900">
+                              {aluno.nome}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {aluno.email}
+                            </p>
                             <p className="text-xs text-gray-500">
-                              Matrícula: {aluno.matricula} | Turma: {aluno.turma}
+                              Matrícula: {aluno.matricula} | Turma:{" "}
+                              {aluno.turma}
                             </p>
                           </div>
                         </div>
@@ -552,7 +653,12 @@ export default function OrientadosProfessor() {
               </button>
               <button
                 onClick={handleConvidar}
-                disabled={!alunoSelecionado || !tituloProposto.trim() || !descricaoProposta.trim() || loading}
+                disabled={
+                  !alunoSelecionado ||
+                  !tituloProposto.trim() ||
+                  !descricaoProposta.trim() ||
+                  loading
+                }
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
               >
                 {loading ? (
@@ -572,7 +678,36 @@ export default function OrientadosProfessor() {
         </div>
       )}
 
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        toastClassName={(context) => {
+          // context.type pode ser: "default", "success", "info", "warning", "error"
+          const base =
+            "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+          switch (context?.type) {
+            case "success":
+              return `${base} !bg-[#2F9E41]`; // verde
+            case "error":
+              return `${base} !bg-red-600`;
+            case "info":
+              return `${base} !bg-blue-600`;
+            case "warning":
+              return `${base} !bg-yellow-600 !text-black`;
+            default:
+              return `${base} !bg-[#2F9E41]`;
+          }
+        }}
+        bodyClassName="!text-white"
+      />
     </div>
   );
 }
