@@ -1,31 +1,60 @@
 import { useEffect, useState } from "react";
 import ProfessorMenu from "./menu-professor";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function MainpageProfessor() {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchPerfil() {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          console.log("Token não encontrado, aguardando um momento...");
+          // Aguardar um pouco para o token ser salvo após cadastro/login
+          setTimeout(() => {
+            const tokenAfterDelay = localStorage.getItem("token");
+            if (!tokenAfterDelay) {
+              console.log("Token ainda não encontrado, redirecionando para login");
+              navigate("/login");
+            } else {
+              // Tentar novamente após encontrar o token
+              fetchPerfil();
+            }
+          }, 500);
+          return;
+        }
+
         const response = await fetch("http://localhost:8000/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
         if (response.ok) {
           const data = await response.json();
           setUser(data);
           // Atualizar o localStorage com o nome correto
           localStorage.setItem("nome", data.nome);
+        } else if (response.status === 401) {
+          console.log("Token expirado ou inválido, redirecionando para login");
+          localStorage.removeItem("token");
+          localStorage.removeItem("nome");
+          localStorage.removeItem("userType");
+          navigate("/login");
         } else {
-          console.error("Erro ao carregar dados do perfil.");
+          console.error("Erro ao carregar dados do perfil:", response.status);
         }
       } catch (error) {
         console.error("Erro de conexão:", error);
+        // Em caso de erro de conexão, também redirecionar para login
+        localStorage.removeItem("token");
+        localStorage.removeItem("nome");
+        localStorage.removeItem("userType");
+        navigate("/login");
       }
     }
     fetchPerfil();
-  }, []);
+  }, [navigate]);
 
   // Usar o nome do usuário da API se disponível, senão usar do localStorage, senão usar fallback
   const nome = user?.nome || localStorage.getItem("nome") || "Professor";

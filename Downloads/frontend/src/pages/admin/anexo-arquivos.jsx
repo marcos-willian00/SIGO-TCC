@@ -2,6 +2,18 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import AdminMenu from "./admin-menu";
 import httpClient from "../../services/api";
+import { 
+  FiUpload, 
+  FiFile, 
+  FiDownload, 
+  FiTrash2, 
+  FiPlus,
+  FiFileText,
+  FiFilePlus,
+  FiX,
+  FiFolder,
+  FiCalendar
+} from "react-icons/fi";
 
 export default function AnexoArquivos() {
   const [files, setFiles] = useState([]);
@@ -131,169 +143,281 @@ export default function AnexoArquivos() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminMenu />
-      <div className="flex-1 ml-64 p-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-[#2F9E41]">Anexo de Arquivos</h1>
-          <button
-            onClick={() => setShowUploadModal(true)}
-            className="bg-[#2F9E41] text-white px-6 py-2 rounded-lg hover:bg-[#217a32] transition font-semibold shadow flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Adicionar Arquivo
-          </button>
-        </div>
-
-        {/* Lista de Arquivos */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4 text-[#2F9E41]">Arquivos do Sistema</h2>
-          
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500">Carregando arquivos...</div>
-            </div>
-          ) : files.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500 mb-4">Nenhum arquivo encontrado</div>
-              <button
-                onClick={() => setShowUploadModal(true)}
-                className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition"
-              >
-                Adicionar Primeiro Arquivo
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left">
-                <thead>
-                  <tr className="border-b">
-                    <th className="py-3 px-4 font-semibold">Nome do Arquivo</th>
-                    <th className="py-3 px-4 font-semibold">Tamanho</th>
-                    <th className="py-3 px-4 font-semibold">Tipo</th>
-                    <th className="py-3 px-4 font-semibold">Data Upload</th>
-                    <th className="py-3 px-4 font-semibold">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {files.map((file) => (
-                    <tr key={file.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          {file.nome}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">{file.tamanho}</td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                          {file.tipo.includes('pdf') ? 'PDF' : 
-                           file.tipo.includes('word') ? 'Word' : 
-                           'Documento'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">
-                        {new Date(file.uploadedAt).toLocaleDateString('pt-BR')}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDownloadFile(file.id, file.nome)}
-                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition text-sm"
-                            title="Download"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => handleDeleteFile(file.id)}
-                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition text-sm"
-                            title="Excluir"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Modal de Upload */}
-        {showUploadModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#2F9E41]">Upload de Arquivo</h2>
-                <button
-                  onClick={() => setShowUploadModal(false)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2 text-gray-700">
-                  Selecionar Arquivos
-                </label>
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileSelect}
-                  className="w-full border-2 border-dashed border-[#2F9E41] rounded-lg p-4 text-center cursor-pointer hover:border-[#217a32] transition"
-                  accept=".pdf,.doc,.docx,.txt,.xlsx,.xls"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Formatos aceitos: PDF, Word, Excel, Texto
-                </p>
-              </div>
-
-              {selectedFiles.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-medium mb-2">Arquivos Selecionados:</h3>
-                  <div className="max-h-32 overflow-y-auto">
-                    {selectedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded mb-1">
-                        <span className="text-sm truncate">{file.name}</span>
-                        <span className="text-xs text-gray-500">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </span>
-                      </div>
-                    ))}
+      <div className="flex-1 ml-64">
+        <div className="min-h-screen bg-gray-100 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#2F9E41] bg-opacity-15 p-3 rounded-lg border border-[#2F9E41] border-opacity-20">
+                    <FiFolder className="h-8 w-8 text-[#2F9E41]" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Gerenciar Arquivos</h1>
+                    <p className="text-gray-600">Gerencie documentos e anexos do sistema acadêmico</p>
                   </div>
                 </div>
-              )}
-
-              <div className="flex gap-2 justify-end">
                 <button
-                  onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                  disabled={uploading}
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-2 bg-[#2F9E41] text-white px-6 py-3 rounded-lg hover:bg-[#217a32] transition-colors font-medium shadow-sm"
                 >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleUpload}
-                  disabled={selectedFiles.length === 0 || uploading}
-                  className="px-6 py-2 bg-[#2F9E41] text-white rounded-lg hover:bg-[#217a32] transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {uploading ? "Enviando..." : "Enviar"}
+                  <FiPlus className="h-5 w-5" />
+                  Adicionar Arquivo
                 </button>
               </div>
             </div>
-          </div>
-        )}
 
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total de Arquivos</p>
+                    <p className="text-2xl font-bold text-gray-900">{files.length}</p>
+                    <p className="text-sm text-gray-500">Documentos</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-full p-3">
+                    <FiFile className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Espaço Utilizado</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {files.reduce((total, file) => {
+                        const size = parseFloat(file.tamanho.replace(' MB', ''));
+                        return total + size;
+                      }, 0).toFixed(1)} MB
+                    </p>
+                    <p className="text-sm text-gray-500">Total</p>
+                  </div>
+                  <div className="bg-green-50 rounded-full p-3">
+                    <FiUpload className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Lista de Arquivos */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <FiFileText className="h-5 w-5 text-[#2F9E41]" />
+                  <h2 className="text-lg font-semibold text-gray-900">Arquivos do Sistema</h2>
+                </div>
+              </div>
+              
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2F9E41] mx-auto mb-4"></div>
+                  <p className="text-gray-600">Carregando arquivos...</p>
+                </div>
+              ) : files.length === 0 ? (
+                <div className="p-8 text-center">
+                  <FiFile className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-900 mb-2">Nenhum arquivo encontrado</p>
+                  <p className="text-gray-600 mb-4">Comece adicionando seu primeiro arquivo ao sistema</p>
+                  <button
+                    onClick={() => setShowUploadModal(true)}
+                    className="flex items-center gap-2 bg-[#2F9E41] text-white px-4 py-2 rounded-lg hover:bg-[#217a32] transition-colors mx-auto"
+                  >
+                    <FiPlus className="h-4 w-4" />
+                    Adicionar Primeiro Arquivo
+                  </button>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Arquivo
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tamanho
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tipo
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Data Upload
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {files.map((file) => (
+                        <tr key={file.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-blue-50 rounded-full p-2">
+                                <FiFile className="h-4 w-4 text-blue-600" />
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{file.nome}</div>
+                                <div className="text-sm text-gray-500">Enviado por: {file.uploadedBy}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900 font-medium">{file.tamanho}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              file.tipo.includes('pdf') ? 'bg-red-100 text-red-800' :
+                              file.tipo.includes('word') ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {file.tipo.includes('pdf') ? 'PDF' : 
+                               file.tipo.includes('word') ? 'Word' : 
+                               'Documento'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <FiCalendar className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-900">
+                                {new Date(file.uploadedAt).toLocaleDateString('pt-BR')}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleDownloadFile(file.id, file.nome)}
+                                className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                                title="Download"
+                              >
+                                <FiDownload className="h-4 w-4" />
+                                Download
+                              </button>
+                              <button
+                                onClick={() => handleDeleteFile(file.id)}
+                                className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                                title="Excluir"
+                              >
+                                <FiTrash2 className="h-4 w-4" />
+                                Excluir
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Modal de Upload */}
+            {showUploadModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/5 backdrop-blur-sm">
+                <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg mx-4">
+                  {/* Header do Modal */}
+                  <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-[#2F9E41] bg-opacity-10 p-2 rounded-lg">
+                        <FiUpload className="h-5 w-5 text-[#2F9E41]" />
+                      </div>
+                      <h2 className="text-lg font-semibold text-gray-900">Upload de Arquivo</h2>
+                    </div>
+                    <button
+                      onClick={() => setShowUploadModal(false)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <FiX className="h-6 w-6" />
+                    </button>
+                  </div>
+
+                  {/* Conteúdo do Modal */}
+                  <div className="p-6">
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Selecionar Arquivos
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleFileSelect}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          accept=".pdf,.doc,.docx,.txt,.xlsx,.xls"
+                        />
+                        <div className="border-2 border-dashed border-[#2F9E41] border-opacity-50 rounded-lg p-8 text-center hover:border-[#2F9E41] transition-colors">
+                          <FiFilePlus className="h-12 w-12 text-[#2F9E41] mx-auto mb-4" />
+                          <p className="text-lg font-medium text-gray-900 mb-2">
+                            Clique para selecionar arquivos
+                          </p>
+                          <p className="text-sm text-gray-600 mb-2">
+                            ou arraste e solte aqui
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Formatos aceitos: PDF, Word, Excel, Texto
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedFiles.length > 0 && (
+                      <div className="mb-6">
+                        <h3 className="text-sm font-medium text-gray-900 mb-3">
+                          Arquivos Selecionados ({selectedFiles.length})
+                        </h3>
+                        <div className="max-h-32 overflow-y-auto space-y-2">
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <FiFile className="h-4 w-4 text-gray-500" />
+                                <span className="text-sm text-gray-900 truncate max-w-xs">{file.name}</span>
+                              </div>
+                              <span className="text-xs text-gray-500 font-medium">
+                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer do Modal */}
+                  <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                    <button
+                      onClick={() => setShowUploadModal(false)}
+                      className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      disabled={uploading}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleUpload}
+                      disabled={selectedFiles.length === 0 || uploading}
+                      className="flex items-center gap-2 px-6 py-2 bg-[#2F9E41] text-white rounded-lg hover:bg-[#217a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    >
+                      {uploading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <FiUpload className="h-4 w-4" />
+                          Enviar Arquivos
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         <ToastContainer />
       </div>
     </div>

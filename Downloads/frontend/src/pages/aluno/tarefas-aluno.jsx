@@ -248,7 +248,7 @@ export default function KanbanAluno() {
 
         {/* Modal de detalhes da tarefa */}
         {showTaskModal && selectedTask && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
               <button
                 className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl"

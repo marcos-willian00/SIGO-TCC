@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AlunoMenu from "./aluno-menu";
 import { ToastContainer, toast } from "react-toastify";
+import httpClient from "../../services/api";
 import { 
   FiMail, 
   FiUser, 
@@ -17,19 +18,21 @@ export default function ConvitesAluno() {
   const [loading, setLoading] = useState(false);
   const [confirm, setConfirm] = useState({ open: false, action: null, conviteId: null });
 
-  useEffect(() => {
-    async function fetchConvites() {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/students/me/convites-orientacao", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setConvites(data);
-      }
+  // Função para buscar convites
+  const fetchConvites = async () => {
+    setLoading(true);
+    try {
+      const response = await httpClient.get("/students/me/convites-orientacao");
+      setConvites(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar convites:", error);
+      toast.error("Erro ao carregar convites.");
+    } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchConvites();
   }, []);
 
@@ -45,52 +48,53 @@ export default function ConvitesAluno() {
   // Aceitar convite
   const handleAceitar = async (conviteId) => {
     setLoading(true);
-    const token = localStorage.getItem("token");
-    const response = await fetch(
-      `http://localhost:8000/students/me/convites-orientacao/${conviteId}/responder`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ "status": "aceito" })
+    try {
+      console.log("Enviando requisição para aceitar convite:", conviteId);
+      
+      const response = await httpClient.post(
+        `/students/me/convites-orientacao/${conviteId}/responder`,
+        { "status": "aceito" }
+      );
+      
+      console.log("Resposta do servidor:", response.data);
+      toast.success("Convite aceito com sucesso!");
+      fetchConvites();
+    } catch (error) {
+      console.error("Erro ao aceitar convite:", error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error("Erro ao aceitar convite. Tente novamente.");
       }
-    );
-    if (response.ok) {
-      toast.success("Convite aceito! Agora você é orientando deste professor.");
-      setConvites(convites.filter((c) => c.id !== conviteId));
-      // Aqui você pode atualizar o acesso do aluno, se necessário
-    } else {
-      const data = await response.json();
-      toast.error(data.detail || "Erro ao aceitar convite.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Recusar convite
   const handleRecusar = async (conviteId) => {
     setLoading(true);
-    const token = localStorage.getItem("token");
-    const response = await fetch(
-      `http://localhost:8000/students/me/convites-orientacao/${conviteId}/responder`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ "status": "recusado" }),
-      }
-    );
-    if (response.ok) {
+    try {
+      console.log("Enviando requisição para recusar convite:", conviteId);
+      
+      const response = await httpClient.post(
+        `/students/me/convites-orientacao/${conviteId}/responder`,
+        { "status": "recusado" }
+      );
+      
+      console.log("Resposta do servidor:", response.data);
       toast.success("Convite recusado.");
-      setConvites(convites.filter((c) => c.id !== conviteId));
-    } else {
-      const data = await response.json();
-      toast.error(data.detail || "Erro ao recusar convite.");
+      fetchConvites();
+    } catch (error) {
+      console.error("Erro ao recusar convite:", error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error("Erro ao recusar convite. Tente novamente.");
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -102,8 +106,8 @@ export default function ConvitesAluno() {
             {/* Header Section */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
               <div className="flex items-center gap-3">
-                <div className="bg-[#2F9E41] bg-opacity-10 p-2 rounded-lg">
-                  <FiMail className="h-8 w-8 text-[#2F9E41]" />
+                <div className="bg-[#2F9E41] bg-opacity-15 p-3 rounded-lg border border-[#2F9E41] border-opacity-20">
+                  <FiMail className="h-8 w-8 text-[#ffffff]" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Convites de Orientação</h1>
@@ -115,7 +119,25 @@ export default function ConvitesAluno() {
               <div className="mt-4 flex gap-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-[#2F9E41]">{convites.length}</p>
-                  <p className="text-sm text-gray-600">Convites Pendentes</p>
+                  <p className="text-sm text-gray-600">Total de Convites</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">
+                    {convites.filter(c => c.status === 'aceito').length}
+                  </p>
+                  <p className="text-sm text-gray-600">Aceitos</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-orange-500">
+                    {convites.filter(c => c.status === 'pendente' || !c.status).length}
+                  </p>
+                  <p className="text-sm text-gray-600">Pendentes</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-red-500">
+                    {convites.filter(c => c.status === 'recusado').length}
+                  </p>
+                  <p className="text-sm text-gray-600">Recusados</p>
                 </div>
               </div>
             </div>
@@ -149,26 +171,39 @@ export default function ConvitesAluno() {
                 {convites.map((convite) => (
                   <div key={convite.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     {/* Card Header */}
-                    <div className="bg-gradient-to-r from-[#2F9E41] to-[#217a32] px-6 py-4">
+                    <div className={`px-6 py-4 ${
+                      convite.status === "aceito" ? "bg-gradient-to-r from-green-500 to-green-600" :
+                      convite.status === "recusado" ? "bg-gradient-to-r from-red-500 to-red-600" :
+                      "bg-gradient-to-r from-[#2F9E41] to-[#217a32]"
+                    }`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white bg-opacity-20 rounded-full p-2">
-                            <FiUser className="h-6 w-6 text-white" />
+                          <div className="bg-white bg-opacity-30 rounded-full p-2 border border-white border-opacity-30">
+                            <FiUser className="h-6 w-6 text-[#2F9E41]" />
                           </div>
                           <div>
                             <h3 className="text-xl font-semibold text-white">
                               {convite.professor?.nome || "Professor"}
                             </h3>
-                            <p className="text-green-100 text-sm">
+                            <p className="text-white text-opacity-90 text-sm">
                               {convite.professor?.departamento && `${convite.professor.departamento} • `}
                               {convite.professor?.titulacao || "Professor"}
                             </p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-1 bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                          <FiClock className="h-4 w-4 text-white" />
-                          <span className="text-white text-sm">Pendente</span>
+                        <div className="flex items-center gap-1 bg-white bg-opacity-30 px-3 py-1 rounded-full border border-white border-opacity-30">
+                          {convite.status === "aceito" ? (
+                            <FiCheck className="h-4 w-4 text-[#2F9E41] drop-shadow-sm" />
+                          ) : convite.status === "recusado" ? (
+                            <FiX className="h-4 w-4 text-red drop-shadow-sm" />
+                          ) : (
+                            <FiClock className="h-4 w-4 text-[#2F9E41] drop-shadow-sm" />
+                          )}
+                          <span className="text-[#2F9E41] text-sm font-medium">
+                            {convite.status === "aceito" ? "Aceito" : 
+                             convite.status === "recusado" ? "Recusado" : "Pendente"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -178,8 +213,10 @@ export default function ConvitesAluno() {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Proposta de TCC */}
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <FiBook className="h-5 w-5 text-[#2F9E41]" />
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="bg-[#2F9E41] bg-opacity-10 p-2 rounded-lg">
+                              <FiBook className="h-5 w-5 text-[#ffffff]" />
+                            </div>
                             <h4 className="font-semibold text-gray-900">Proposta de TCC</h4>
                           </div>
                           
@@ -198,8 +235,10 @@ export default function ConvitesAluno() {
 
                         {/* Informações do Professor */}
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <FiUser className="h-5 w-5 text-[#2F9E41]" />
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="bg-[#2F9E41] bg-opacity-10 p-2 rounded-lg">
+                              <FiUser className="h-5 w-5 text-[#ffffff]" />
+                            </div>
                             <h4 className="font-semibold text-gray-900">Informações do Professor</h4>
                           </div>
                           
@@ -233,25 +272,37 @@ export default function ConvitesAluno() {
 
                       {/* Actions */}
                       <div className="mt-6 pt-4 border-t border-gray-200">
-                        <div className="flex flex-col sm:flex-row gap-3 justify-end">
-                          <button
-                            onClick={() => confirmarRecusar(convite.id)}
-                            disabled={loading}
-                            className="flex items-center justify-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                          >
-                            <FiX className="h-4 w-4" />
-                            Recusar Convite
-                          </button>
-                          
-                          <button
-                            onClick={() => confirmarAceitar(convite.id)}
-                            disabled={loading}
-                            className="flex items-center justify-center gap-2 px-6 py-2 bg-[#2F9E41] text-white rounded-lg hover:bg-[#217a32] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                          >
-                            <FiCheck className="h-4 w-4" />
-                            Aceitar Convite
-                          </button>
-                        </div>
+                        {convite.status === "aceito" ? (
+                          <div className="flex items-center justify-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <FiCheck className="h-5 w-5 text-green-600" />
+                            <span className="text-green-800 font-medium">Convite Aceito - Você agora é orientando deste professor</span>
+                          </div>
+                        ) : convite.status === "recusado" ? (
+                          <div className="flex items-center justify-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <FiX className="h-5 w-5 text-red-600" />
+                            <span className="text-red-800 font-medium">Convite Recusado</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+                            <button
+                              onClick={() => confirmarRecusar(convite.id)}
+                              disabled={loading}
+                              className="flex items-center justify-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                            >
+                              <FiX className="h-4 w-4" />
+                              Recusar Convite
+                            </button>
+                            
+                            <button
+                              onClick={() => confirmarAceitar(convite.id)}
+                              disabled={loading}
+                              className="flex items-center justify-center gap-2 px-6 py-2 bg-[#2F9E41] text-white rounded-lg hover:bg-[#217a32] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                            >
+                              <FiCheck className="h-4 w-4" />
+                              Aceitar Convite
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -264,7 +315,7 @@ export default function ConvitesAluno() {
 
       {/* Modal de Confirmação */}
       {confirm.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
             <div className="text-center">
               <div className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 ${

@@ -21,10 +21,10 @@ import ConvitesAluno from '../pages/aluno/convites-aluno';
 import TodosProfessores from '../pages/aluno/professores-aluno';
 import MainpageAlunoOrientando from '../pages/aluno/mainpage-aluno-orientando';
 import MeuOrientador from '../pages/aluno/meu-orientador';
-import UsuariosAdmin from '../pages/admin/usuarios-admin';
 import Documentacao from '../pages/professor/documentacao-professor';
 import DocumentacaoAluno from '../pages/aluno/documentacao-aluno';
 import GerenciarAlunos from '../pages/admin/gerenciar-alunos';
+import GerenciarProfessores from '../pages/admin/gerenciar-professores';
 import GerenciarAlunosCoordenador from '../pages/coordenador/gerenciar-alunos';
 import AlunosDepartamento from '../pages/coordenador/alunos-departamento';
 import ProfessoresCadastrados from '../pages/coordenador/professores-cadastrados';
@@ -75,8 +75,8 @@ function Router() {
         path="/aluno/mainpage-aluno-orientando"
         element={<MainpageAlunoOrientando />}
       />
-      <Route path="/admin/usuarios-admin" element={<UsuariosAdmin />} />
       <Route path="/admin/gerenciar-alunos" element={<GerenciarAlunos />} />
+      <Route path="/admin/gerenciar-professores" element={<GerenciarProfessores />} />
       <Route path="/admin/perfil" element={<PerfilAdmin />} />
       <Route path="/coordenador/gerenciar-alunos" element={<GerenciarAlunosCoordenador />} />
       <Route path="/coordenador/alunos" element={<AlunosDepartamento />} />

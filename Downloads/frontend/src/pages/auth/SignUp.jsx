@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { loginService } from "../../services/AuthService";
 
 function Cadastro() {
   const navigate = useNavigate();
@@ -64,11 +65,30 @@ function Cadastro() {
 
       if (response.ok) {
         toast.success("Cadastro realizado com sucesso!");
-        if (form.user_type === "aluno") {
-          navigate("/aluno");
-        } else if (form.user_type === "professor") {
-          navigate("/professor");
+        
+        // Fazer login automático após cadastro bem-sucedido
+        console.log("Fazendo login automático após cadastro...");
+        const loginResponse = await loginService(form.email, form.password);
+        
+        if (loginResponse.success) {
+          const user = loginResponse.user;
+          console.log("Login automático bem-sucedido:", user);
+          
+          // Redirecionar baseado no tipo de usuário
+          if (user.user_type === "estudante") {
+            navigate("/aluno");
+          } else if (user.user_type === "professor") {
+            navigate("/professor");
+          } else if (user.user_type === "coordenador") {
+            navigate("/coordenador");
+          } else if (user.user_type === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/login");
+          }
         } else {
+          console.error("Erro no login automático:", loginResponse.error);
+          toast.info("Cadastro realizado! Faça login para acessar o sistema.");
           navigate("/login");
         }
       } else {

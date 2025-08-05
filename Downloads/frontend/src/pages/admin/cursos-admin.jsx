@@ -194,7 +194,7 @@ export default function CursosAdmin() {
 
                 {/* Modal para cadastro de curso */}
                 {showForm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/5 backdrop-blur-sm">
                         <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
                             <div className="bg-gradient-to-r from-[#2F9E41] to-[#217a32] px-6 py-4 rounded-t-lg">
                                 <h2 className="text-xl font-semibold text-white flex items-center gap-2">
@@ -240,7 +240,7 @@ export default function CursosAdmin() {
 
                 {/* Modal para atribuir coordenador */}
                 {showAssignModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/5 backdrop-blur-sm">
                         <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden">
                             <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
                                 <h2 className="text-xl font-semibold text-white flex items-center gap-2">

@@ -23,11 +23,11 @@ export default function AdminMenu() {
           <Link to="/admin" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaHome /> Início
           </Link>
-          <Link to="/admin/usuarios-admin" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
-            <FaUsers /> Gerenciar Usuários
-          </Link>
           <Link to="/admin/gerenciar-alunos" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaArchive /> Gerenciar Alunos
+          </Link>
+          <Link to="/admin/gerenciar-professores" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+            <FaChalkboardTeacher /> Gerenciar Professores
           </Link>
           <Link to="/admin/cursos-admin" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
             <FaBook /> Cursos
