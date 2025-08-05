@@ -17,7 +17,7 @@ export default function MainpageAlunoOrientando() {
             <div className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-[#2F9E41] mb-2">
-                  Bom dia Prof. {nome}
+                  Bom dia {nome}
                 </h2>
                 <p className="text-gray-700 max-w-md">
                   Que bom ter você aqui! O SIGO-TCC é seu novo aliado na jornada
@@ -35,7 +35,7 @@ export default function MainpageAlunoOrientando() {
               <div className="w-48">
                 {/* Imagem ilustrativa */}
                 <img
-                  src="./public/Asset 1 1.svg"
+                  src="../public/Asset 1 1.svg"
                   alt="Boas-vindas"
                   className="w-full"
                 />
@@ -117,7 +117,7 @@ export default function MainpageAlunoOrientando() {
               </div>
               {/* Imagem ilustrativa */}
               <img
-                src="./public/Asset 1e.svg"
+                src="../public/Asset 1e.svg"
                 alt="Entregas marcadas"
                 className="w-30"
               />
@@ -135,7 +135,7 @@ export default function MainpageAlunoOrientando() {
                 </p>
               </div>
               <img
-                src="./public/Asset 1.svg"
+                src="../public/Asset 1.svg"
                 alt="Entregas realizadas"
                 className="w-30"
               />
@@ -151,7 +151,7 @@ export default function MainpageAlunoOrientando() {
                 </p>
               </div>
               <img
-                src="./public/Asset 1a.svg"
+                src="../public/Asset 1a.svg"
                 alt="Entregas atrasadas"
                 className="w-30"
               />
@@ -169,7 +169,7 @@ export default function MainpageAlunoOrientando() {
                 </p>
               </div>
               <img
-                src="./public/Asset 1gg.svg"
+                src="../public/Asset 1gg.svg"
                 alt="Meses para conclusão"
                 className="w-30"
               />

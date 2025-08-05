@@ -2,21 +2,25 @@ import { useEffect, useState } from "react";
 import AlunoMenu from "./aluno-menu";
 import { ToastContainer, toast } from "react-toastify";
 import httpClient from "../../services/api";
-import { 
-  FiMail, 
-  FiUser, 
-  FiBook, 
-  FiCheck, 
-  FiX, 
+import {
+  FiMail,
+  FiUser,
+  FiBook,
+  FiCheck,
+  FiX,
   FiClock,
   FiFileText,
-  FiInbox
+  FiInbox,
 } from "react-icons/fi";
 
 export default function ConvitesAluno() {
   const [convites, setConvites] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [confirm, setConfirm] = useState({ open: false, action: null, conviteId: null });
+  const [confirm, setConfirm] = useState({
+    open: false,
+    action: null,
+    conviteId: null,
+  });
 
   // Função para buscar convites
   const fetchConvites = async () => {
@@ -36,8 +40,10 @@ export default function ConvitesAluno() {
     fetchConvites();
   }, []);
 
-  const confirmarAceitar = (conviteId) => setConfirm({ open: true, action: "aceitar", conviteId });
-  const confirmarRecusar = (conviteId) => setConfirm({ open: true, action: "recusar", conviteId });
+  const confirmarAceitar = (conviteId) =>
+    setConfirm({ open: true, action: "aceitar", conviteId });
+  const confirmarRecusar = (conviteId) =>
+    setConfirm({ open: true, action: "recusar", conviteId });
 
   const executarConfirmacao = async () => {
     if (confirm.action === "aceitar") await handleAceitar(confirm.conviteId);
@@ -50,12 +56,12 @@ export default function ConvitesAluno() {
     setLoading(true);
     try {
       console.log("Enviando requisição para aceitar convite:", conviteId);
-      
+
       const response = await httpClient.post(
         `/students/me/convites-orientacao/${conviteId}/responder`,
-        { "status": "aceito" }
+        { status: "aceito" }
       );
-      
+
       console.log("Resposta do servidor:", response.data);
       toast.success("Convite aceito com sucesso!");
       fetchConvites();
@@ -76,12 +82,12 @@ export default function ConvitesAluno() {
     setLoading(true);
     try {
       console.log("Enviando requisição para recusar convite:", conviteId);
-      
+
       const response = await httpClient.post(
         `/students/me/convites-orientacao/${conviteId}/responder`,
-        { "status": "recusado" }
+        { status: "recusado" }
       );
-      
+
       console.log("Resposta do servidor:", response.data);
       toast.success("Convite recusado.");
       fetchConvites();
@@ -110,32 +116,43 @@ export default function ConvitesAluno() {
                   <FiMail className="h-8 w-8 text-[#ffffff]" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Convites de Orientação</h1>
-                  <p className="text-gray-600">Gerencie os convites recebidos de professores para orientação de TCC</p>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Convites de Orientação
+                  </h1>
+                  <p className="text-gray-600">
+                    Gerencie os convites recebidos de professores para
+                    orientação de TCC
+                  </p>
                 </div>
               </div>
-              
+
               {/* Estatísticas */}
               <div className="mt-4 flex gap-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-[#2F9E41]">{convites.length}</p>
+                  <p className="text-2xl font-bold text-[#2F9E41]">
+                    {convites.length}
+                  </p>
                   <p className="text-sm text-gray-600">Total de Convites</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">
-                    {convites.filter(c => c.status === 'aceito').length}
+                    {convites.filter((c) => c.status === "aceito").length}
                   </p>
                   <p className="text-sm text-gray-600">Aceitos</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-orange-500">
-                    {convites.filter(c => c.status === 'pendente' || !c.status).length}
+                    {
+                      convites.filter(
+                        (c) => c.status === "pendente" || !c.status
+                      ).length
+                    }
                   </p>
                   <p className="text-sm text-gray-600">Pendentes</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-red-500">
-                    {convites.filter(c => c.status === 'recusado').length}
+                    {convites.filter((c) => c.status === "recusado").length}
                   </p>
                   <p className="text-sm text-gray-600">Recusados</p>
                 </div>
@@ -154,12 +171,17 @@ export default function ConvitesAluno() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                 <div className="text-center">
                   <FiInbox className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-medium text-gray-900 mb-2">Nenhum convite recebido</h3>
+                  <h3 className="text-xl font-medium text-gray-900 mb-2">
+                    Nenhum convite recebido
+                  </h3>
                   <p className="text-gray-600 mb-6">
-                    Você ainda não recebeu convites de orientação de professores.
+                    Você ainda não recebeu convites de orientação de
+                    professores.
                   </p>
                   <button
-                    onClick={() => (window.location.href = '/aluno/professores-aluno')}
+                    onClick={() =>
+                      (window.location.href = "/aluno/professores-aluno")
+                    }
                     className="bg-[#2F9E41] text-white px-6 py-2 rounded-lg hover:bg-[#217a32] transition-colors font-medium"
                   >
                     Ver Professores Disponíveis
@@ -169,13 +191,20 @@ export default function ConvitesAluno() {
             ) : (
               <div className="space-y-6">
                 {convites.map((convite) => (
-                  <div key={convite.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div
+                    key={convite.id}
+                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                  >
                     {/* Card Header */}
-                    <div className={`px-6 py-4 ${
-                      convite.status === "aceito" ? "bg-gradient-to-r from-green-500 to-green-600" :
-                      convite.status === "recusado" ? "bg-gradient-to-r from-red-500 to-red-600" :
-                      "bg-gradient-to-r from-[#2F9E41] to-[#217a32]"
-                    }`}>
+                    <div
+                      className={`px-6 py-4 ${
+                        convite.status === "aceito"
+                          ? "bg-gradient-to-r from-green-500 to-green-600"
+                          : convite.status === "recusado"
+                          ? "bg-gradient-to-r from-red-500 to-red-600"
+                          : "bg-gradient-to-r from-[#2F9E41] to-[#217a32]"
+                      }`}
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="bg-white bg-opacity-30 rounded-full p-2 border border-white border-opacity-30">
@@ -186,12 +215,13 @@ export default function ConvitesAluno() {
                               {convite.professor?.nome || "Professor"}
                             </h3>
                             <p className="text-white text-opacity-90 text-sm">
-                              {convite.professor?.departamento && `${convite.professor.departamento} • `}
+                              {convite.professor?.departamento &&
+                                `${convite.professor.departamento} • `}
                               {convite.professor?.titulacao || "Professor"}
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-1 bg-white bg-opacity-30 px-3 py-1 rounded-full border border-white border-opacity-30">
                           {convite.status === "aceito" ? (
                             <FiCheck className="h-4 w-4 text-[#2F9E41] drop-shadow-sm" />
@@ -201,8 +231,11 @@ export default function ConvitesAluno() {
                             <FiClock className="h-4 w-4 text-[#2F9E41] drop-shadow-sm" />
                           )}
                           <span className="text-[#2F9E41] text-sm font-medium">
-                            {convite.status === "aceito" ? "Aceito" : 
-                             convite.status === "recusado" ? "Recusado" : "Pendente"}
+                            {convite.status === "aceito"
+                              ? "Aceito"
+                              : convite.status === "recusado"
+                              ? "Recusado"
+                              : "Pendente"}
                           </span>
                         </div>
                       </div>
@@ -217,16 +250,24 @@ export default function ConvitesAluno() {
                             <div className="bg-[#2F9E41] bg-opacity-10 p-2 rounded-lg">
                               <FiBook className="h-5 w-5 text-[#ffffff]" />
                             </div>
-                            <h4 className="font-semibold text-gray-900">Proposta de TCC</h4>
+                            <h4 className="font-semibold text-gray-900">
+                              Proposta de TCC
+                            </h4>
                           </div>
-                          
+
                           <div>
-                            <label className="text-sm font-medium text-gray-700">Título Proposto:</label>
-                            <p className="text-gray-900 mt-1 font-medium">{convite.titulo_proposto}</p>
+                            <label className="text-sm font-medium text-gray-700">
+                              Título Proposto:
+                            </label>
+                            <p className="text-gray-900 mt-1 font-medium">
+                              {convite.titulo_proposto}
+                            </p>
                           </div>
-                          
+
                           <div>
-                            <label className="text-sm font-medium text-gray-700">Descrição:</label>
+                            <label className="text-sm font-medium text-gray-700">
+                              Descrição:
+                            </label>
                             <p className="text-gray-600 mt-1 text-sm leading-relaxed">
                               {convite.descricao_proposta}
                             </p>
@@ -239,31 +280,49 @@ export default function ConvitesAluno() {
                             <div className="bg-[#2F9E41] bg-opacity-10 p-2 rounded-lg">
                               <FiUser className="h-5 w-5 text-[#ffffff]" />
                             </div>
-                            <h4 className="font-semibold text-gray-900">Informações do Professor</h4>
+                            <h4 className="font-semibold text-gray-900">
+                              Informações do Professor
+                            </h4>
                           </div>
-                          
+
                           <div className="space-y-3">
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Nome:</label>
-                              <p className="text-gray-900 mt-1">{convite.professor?.nome || "Não informado"}</p>
+                              <label className="text-sm font-medium text-gray-700">
+                                Nome:
+                              </label>
+                              <p className="text-gray-900 mt-1">
+                                {convite.professor?.nome || "Não informado"}
+                              </p>
                             </div>
-                            
+
                             <div>
-                              <label className="text-sm font-medium text-gray-700">Email:</label>
-                              <p className="text-gray-900 mt-1 break-all">{convite.professor?.email || "Não informado"}</p>
+                              <label className="text-sm font-medium text-gray-700">
+                                Email:
+                              </label>
+                              <p className="text-gray-900 mt-1 break-all">
+                                {convite.professor?.email || "Não informado"}
+                              </p>
                             </div>
-                            
+
                             {convite.professor?.departamento && (
                               <div>
-                                <label className="text-sm font-medium text-gray-700">Departamento:</label>
-                                <p className="text-gray-900 mt-1">{convite.professor.departamento}</p>
+                                <label className="text-sm font-medium text-gray-700">
+                                  Departamento:
+                                </label>
+                                <p className="text-gray-900 mt-1">
+                                  {convite.professor.departamento}
+                                </p>
                               </div>
                             )}
-                            
+
                             {convite.professor?.telefone && (
                               <div>
-                                <label className="text-sm font-medium text-gray-700">Telefone:</label>
-                                <p className="text-gray-900 mt-1">{convite.professor.telefone}</p>
+                                <label className="text-sm font-medium text-gray-700">
+                                  Telefone:
+                                </label>
+                                <p className="text-gray-900 mt-1">
+                                  {convite.professor.telefone}
+                                </p>
                               </div>
                             )}
                           </div>
@@ -275,12 +334,17 @@ export default function ConvitesAluno() {
                         {convite.status === "aceito" ? (
                           <div className="flex items-center justify-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
                             <FiCheck className="h-5 w-5 text-green-600" />
-                            <span className="text-green-800 font-medium">Convite Aceito - Você agora é orientando deste professor</span>
+                            <span className="text-green-800 font-medium">
+                              Convite Aceito - Você agora é orientando deste
+                              professor
+                            </span>
                           </div>
                         ) : convite.status === "recusado" ? (
                           <div className="flex items-center justify-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
                             <FiX className="h-5 w-5 text-red-600" />
-                            <span className="text-red-800 font-medium">Convite Recusado</span>
+                            <span className="text-red-800 font-medium">
+                              Convite Recusado
+                            </span>
                           </div>
                         ) : (
                           <div className="flex flex-col sm:flex-row gap-3 justify-end">
@@ -292,7 +356,7 @@ export default function ConvitesAluno() {
                               <FiX className="h-4 w-4" />
                               Recusar Convite
                             </button>
-                            
+
                             <button
                               onClick={() => confirmarAceitar(convite.id)}
                               disabled={loading}
@@ -318,40 +382,45 @@ export default function ConvitesAluno() {
         <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
             <div className="text-center">
-              <div className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 ${
-                confirm.action === "aceitar" ? "bg-green-100" : "bg-red-100"
-              }`}>
+              <div
+                className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-4 ${
+                  confirm.action === "aceitar" ? "bg-green-100" : "bg-red-100"
+                }`}
+              >
                 {confirm.action === "aceitar" ? (
                   <FiCheck className={`h-6 w-6 text-green-600`} />
                 ) : (
                   <FiX className={`h-6 w-6 text-red-600`} />
                 )}
               </div>
-              
+
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {confirm.action === "aceitar" ? "Aceitar Convite" : "Recusar Convite"}
+                {confirm.action === "aceitar"
+                  ? "Aceitar Convite"
+                  : "Recusar Convite"}
               </h3>
-              
+
               <p className="text-gray-600 mb-6">
-                {confirm.action === "aceitar" 
+                {confirm.action === "aceitar"
                   ? "Ao aceitar este convite, você se tornará orientando deste professor e não poderá aceitar outros convites."
-                  : "Tem certeza que deseja recusar este convite? Esta ação não pode ser desfeita."
-                }
+                  : "Tem certeza que deseja recusar este convite? Esta ação não pode ser desfeita."}
               </p>
-              
+
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={() => setConfirm({ open: false, action: null, conviteId: null })}
+                  onClick={() =>
+                    setConfirm({ open: false, action: null, conviteId: null })
+                  }
                   className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                 >
                   Cancelar
                 </button>
-                
+
                 <button
                   onClick={executarConfirmacao}
                   className={`px-4 py-2 text-white rounded-lg font-medium transition-colors ${
-                    confirm.action === "aceitar" 
-                      ? "bg-[#2F9E41] hover:bg-[#217a32]" 
+                    confirm.action === "aceitar"
+                      ? "bg-[#2F9E41] hover:bg-[#217a32]"
                       : "bg-red-500 hover:bg-red-600"
                   }`}
                 >
@@ -363,7 +432,36 @@ export default function ConvitesAluno() {
         </div>
       )}
 
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        toastClassName={(context) => {
+          // context.type pode ser: "default", "success", "info", "warning", "error"
+          const base =
+            "!rounded-l !shadow-lg !font-semibold !text-base !px-6 !py-4 !text-white";
+          switch (context?.type) {
+            case "success":
+              return `${base} !bg-[#2F9E41]`; // verde
+            case "error":
+              return `${base} !bg-red-600`;
+            case "info":
+              return `${base} !bg-blue-600`;
+            case "warning":
+              return `${base} !bg-yellow-600 !text-black`;
+            default:
+              return `${base} !bg-[#2F9E41]`;
+          }
+        }}
+        bodyClassName="!text-white"
+      />
     </div>
   );
 }

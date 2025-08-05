@@ -68,7 +68,7 @@ export default function MainpageAluno() {
           </p>
 
           <img
-            src="./public/Asset 1 1.svg"
+            src="../public/Asset 1 1.svg"
             alt="Imagem de orientação acadêmica"
             className="w-100 mx-auto mt-6 mb-6 max-w-full h-auto"
           />

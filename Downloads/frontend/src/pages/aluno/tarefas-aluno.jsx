@@ -181,7 +181,7 @@ export default function KanbanAluno() {
                                     snapshot.isDragging ? "ring-2 ring-green-400 border-[#2F9E41]" : "border-gray-200"
                                   } hover:bg-green-50 transition`}
                                   style={provided.draggableProps.style}
-                                  onClick={() => openTaskModal(task)}
+                                  // onClick={() => openTaskModal(task)}
                                 >
                                   <div className="flex items-center justify-between">
                                     <span className="font-medium">{task.titulo || task.title}</span>
@@ -207,7 +207,7 @@ export default function KanbanAluno() {
                                             <FiPaperclip className="text-[#2F9E41]" />
                                             <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{arq.nome_arquivo}</span>
                                             <a
-                                              href={`/${arq.caminho_arquivo}`}
+                                              href={`http://localhost:8000/${arq.caminho_arquivo}`}
                                               target="_blank"
                                               rel="noopener noreferrer"
                                               className="flex items-center gap-1 bg-[#2F9E41] text-white px-2 py-1 rounded hover:bg-[#217a32] text-xs font-semibold transition"
@@ -216,7 +216,7 @@ export default function KanbanAluno() {
                                               <FiEye /> Ver
                                             </a>
                                             <a
-                                              href={`/${arq.caminho_arquivo}`}
+                                              href={`http://localhost:8000/${arq.caminho_arquivo}`}
                                               download={arq.nome_arquivo}
                                               className="flex items-center gap-1 bg-[#217a32] text-white px-2 py-1 rounded hover:bg-[#2F9E41] text-xs font-semibold transition"
                                               title="Baixar arquivo"
