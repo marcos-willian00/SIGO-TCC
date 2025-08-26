@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaBookOpen, FaUsers, FaUser, FaTasks } from "react-icons/fa";
+import { FaHome, FaBookOpen, FaUsers, FaUser, FaTasks, FaEnvelopeOpenText } from "react-icons/fa";
 
 export default function ProfessorMenu() {
   const navigate = useNavigate();
@@ -31,6 +31,10 @@ export default function ProfessorMenu() {
         <Link to="/professor/orientados-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaUsers /> Meus Orientandos
         </Link>
+        {/* Novo item do menu para convites recebidos */}
+          <Link to="/professor/convites-recebidos" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
+            <FaEnvelopeOpenText /> Convites Recebidos
+          </Link>
         <Link to="/professor/meu-perfil-professor" className="flex items-center gap-2 py-2 px-4 rounded hover:bg-[#D3FFD2] hover:text-[#2F9E41] hover:font-bold transition">
           <FaUser /> Meu Perfil
         </Link>

@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 import AlunoMenu from "./aluno-menu";
 import { useState, useEffect, useRef } from "react";
@@ -25,7 +26,6 @@ export default function KanbanAluno() {
 
   // Função helper para construir URLs de arquivos
   const getFileUrl = (caminhoArquivo) => {
-    // O caminho já vem com o prefixo 'uploads/', então só precisamos adicionar o host
     return `http://localhost:8000/${caminhoArquivo}`;
   };
 
@@ -33,8 +33,6 @@ export default function KanbanAluno() {
   const fetchTarefas = async () => {
     const token = localStorage.getItem("token");
     let tccId = localStorage.getItem("tcc_id");
-
-    // Se não houver tcc_id, tenta buscar e salvar
     if (!tccId && token) {
       const res = await fetch("http://localhost:8000/students/me/tcc", {
         headers: { Authorization: `Bearer ${token}` }
@@ -47,32 +45,22 @@ export default function KanbanAluno() {
         }
       }
     }
-
     if (!tccId) return;
     const response = await fetch(`http://localhost:8000/tccs/${tccId}/tarefas`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (response.ok) {
       const data = await response.json();
-      console.log("Tarefas carregadas:", data);
-      // Debug dos arquivos
-      data.forEach(task => {
-        if (task.arquivos && task.arquivos.length > 0) {
-          console.log(`Arquivos da tarefa "${task.titulo}":`, task.arquivos);
-        }
-      });
       setTasks(data);
     }
   };
 
-  // Polling para sincronizar com o backend a cada 5 segundos
   useEffect(() => {
     fetchTarefas();
     pollingRef.current = setInterval(fetchTarefas, 5000);
     return () => clearInterval(pollingRef.current);
   }, []);
 
-  // Atualizar status da tarefa ao arrastar
   const onDragEnd = async (result) => {
     if (!result.destination) return;
     const { source, destination } = result;
@@ -83,8 +71,6 @@ export default function KanbanAluno() {
       const tarefa = sourceTasks[source.index];
       const tarefaId = tarefa.id;
       const token = localStorage.getItem("token");
-
-      // Atualiza status no backend
       await fetch(`http://localhost:8000/tarefas/${tarefaId}/status`, {
         method: "PATCH",
         headers: {
@@ -93,20 +79,16 @@ export default function KanbanAluno() {
         },
         body: JSON.stringify({ status: destination.droppableId }),
       });
-
-      // Atualiza do backend para garantir sincronização
       fetchTarefas();
     }
   };
 
-  // Upload de arquivo para tarefa (só ao clicar em Salvar)
   const handleSaveFile = async () => {
     if (!fileToUpload || !selectedTask) return;
     setUploadingTaskId(selectedTask.id);
     const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("file", fileToUpload);
-
     const response = await fetch(`http://localhost:8000/tarefas/${selectedTask.id}/arquivos`, {
       method: "POST",
       headers: {
@@ -114,7 +96,6 @@ export default function KanbanAluno() {
       },
       body: formData,
     });
-
     if (response.ok) {
       alert("Arquivo enviado com sucesso!");
       setFileToUpload(null);
@@ -125,7 +106,6 @@ export default function KanbanAluno() {
     setUploadingTaskId(null);
   };
 
-  // Função para adicionar comentário
   async function handleAddComentario(e) {
     e.preventDefault();
     if (!novoComentario.trim() || !selectedTask) return;
@@ -148,7 +128,6 @@ export default function KanbanAluno() {
     }
   }
 
-  // Modal de tarefa detalhada
   const openTaskModal = (task) => {
     setSelectedTask(task);
     setShowTaskModal(true);

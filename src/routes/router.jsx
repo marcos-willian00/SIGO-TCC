@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import TokenDebug from '../pages/auth/TokenDebug';
 import RecuperarSenha from '../components/RecuperarSenha';
 import CodigoRecuperacao from '../components/CodigoRecuperacao';
 import NovaSenha from '../components/NovaSenha';
@@ -31,6 +32,11 @@ import ProfessoresCadastrados from '../pages/coordenador/professores-cadastrados
 import TrabalhosCoordenador from '../pages/coordenador/trabalhos-coordenador';
 import PerfilAdmin from '../pages/admin/perfil-admin';
 
+// Adicione o import da página de convites recebidos do professor
+import ConvitesRecebidosProfessor from '../pages/professor/convites-recebidos';
+// Se você usa a versão "new" dos orientados, troque o import abaixo:
+// import OrientandosProfessor from '../pages/professor/orientados-professor-new';
+
 function Router() {
   return (
     <Routes>
@@ -40,41 +46,22 @@ function Router() {
       <Route path="/codigo-de-recuperacao" element={<CodigoRecuperacao />} />
       <Route path="/nova-senha" element={<NovaSenha />} />
       <Route path="/aluno" element={<MainpageAluno />} />
-      <Route path="/aluno/meu-perfil-aluno" element={<MeuPerfilAluno />} />{' '}
-      {/* adicione esta linha */}
+      <Route path="/aluno/meu-perfil-aluno" element={<MeuPerfilAluno />} />
       <Route path="/professor" element={<MainpageProfessor />} />
       <Route path="/coordenador" element={<MainpageCoordenador />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/cursos-admin" element={<CursosAdmin />} />
       <Route path="/admin/anexo-arquivos" element={<AnexoArquivos />} />
-      <Route
-        path="/coordenador/meu-perfil-coordenador"
-        element={<MeuPerfilCoordenador />}
-      />
-      <Route
-        path="/professor/meu-perfil-professor"
-        element={<MeuPerfilProfessor />}
-      />
-      <Route
-        path="/coordenador/professores-departamento"
-        element={<ProfessoresDepartamento />}
-      />
-      <Route
-        path="/professor/orientados-professor"
-        element={<OrientandosProfessor />}
-      />
-      <Route
-        path="/professor/tarefas-professor"
-        element={<TarefasProfessor />}
-      />
+      <Route path="/coordenador/meu-perfil-coordenador" element={<MeuPerfilCoordenador />} />
+      <Route path="/professor/meu-perfil-professor" element={<MeuPerfilProfessor />} />
+      <Route path="/coordenador/professores-departamento" element={<ProfessoresDepartamento />} />
+      <Route path="/professor/orientados-professor" element={<OrientandosProfessor />} />
+      <Route path="/professor/tarefas-professor" element={<TarefasProfessor />} />
       <Route path="/aluno/tarefas-aluno" element={<TarefasAluno />} />
       <Route path="/aluno/convites-aluno" element={<ConvitesAluno />} />
       <Route path="/aluno/professores-aluno" element={<TodosProfessores />} />
       <Route path="/aluno/orientador" element={<MeuOrientador />} />
-      <Route
-        path="/aluno/mainpage-aluno-orientando"
-        element={<MainpageAlunoOrientando />}
-      />
+      <Route path="/aluno/mainpage-aluno-orientando" element={<MainpageAlunoOrientando />} />
       <Route path="/admin/gerenciar-alunos" element={<GerenciarAlunos />} />
       <Route path="/admin/gerenciar-professores" element={<GerenciarProfessores />} />
       <Route path="/admin/perfil" element={<PerfilAdmin />} />
@@ -82,13 +69,14 @@ function Router() {
       <Route path="/coordenador/alunos" element={<AlunosDepartamento />} />
       <Route path="/coordenador/professores" element={<ProfessoresCadastrados />} />
       <Route path="/coordenador/trabalhos" element={<TrabalhosCoordenador />} />
-      <Route
-        path="/professor/documentacao-professor"
-        element={<Documentacao />}
-      />
+      <Route path="/professor/documentacao-professor" element={<Documentacao />} />
       <Route path="/aluno/documentacao-aluno" element={<DocumentacaoAluno />} />
+      {/* Adicione a rota para convites recebidos do professor */}
+      <Route path="/professor/convites-recebidos" element={<ConvitesRecebidosProfessor />} />
       {/* Rotas de fallback */}
-      <Route path="*" element={<Login />} />
+    <Route path="/debug-token" element={<TokenDebug />} />
+  <Route path="/debug-token" element={<TokenDebug />} />
+    <Route path="*" element={<Login />} />
     </Routes>
   );
 }

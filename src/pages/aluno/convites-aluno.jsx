@@ -18,23 +18,44 @@ export default function ConvitesAluno() {
   const [loading, setLoading] = useState(false);
   const [confirm, setConfirm] = useState({ open: false, action: null, conviteId: null });
 
-  // Função para buscar convites
+  // Estados para modal de convite
+  const [showModal, setShowModal] = useState(false);
+  const [professores, setProfessores] = useState([]);
+  const [selectedProfessorId, setSelectedProfessorId] = useState("");
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+
+  // Buscar convites
   const fetchConvites = async () => {
     setLoading(true);
     try {
       const response = await httpClient.get("/students/me/convites-orientacao");
       setConvites(response.data);
     } catch (error) {
-      console.error("Erro ao carregar convites:", error);
       toast.error("Erro ao carregar convites.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Buscar professores para o modal
+  const fetchProfessores = async () => {
+    try {
+      // Rota correta para listar todos os professores
+      const response = await httpClient.get("/students/professors");
+      setProfessores(response.data);
+    } catch {
+      toast.error("Erro ao buscar professores.");
+    }
+  };
+
   useEffect(() => {
     fetchConvites();
   }, []);
+
+  useEffect(() => {
+    if (showModal) fetchProfessores();
+  }, [showModal]);
 
   const confirmarAceitar = (conviteId) => setConfirm({ open: true, action: "aceitar", conviteId });
   const confirmarRecusar = (conviteId) => setConfirm({ open: true, action: "recusar", conviteId });
@@ -49,23 +70,14 @@ export default function ConvitesAluno() {
   const handleAceitar = async (conviteId) => {
     setLoading(true);
     try {
-      console.log("Enviando requisição para aceitar convite:", conviteId);
-      
-      const response = await httpClient.post(
+      await httpClient.post(
         `/students/me/convites-orientacao/${conviteId}/responder`,
         { "status": "aceito" }
       );
-      
-      console.log("Resposta do servidor:", response.data);
       toast.success("Convite aceito com sucesso!");
       fetchConvites();
     } catch (error) {
-      console.error("Erro ao aceitar convite:", error);
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
-      } else {
-        toast.error("Erro ao aceitar convite. Tente novamente.");
-      }
+      toast.error("Erro ao aceitar convite.");
     } finally {
       setLoading(false);
     }
@@ -75,25 +87,45 @@ export default function ConvitesAluno() {
   const handleRecusar = async (conviteId) => {
     setLoading(true);
     try {
-      console.log("Enviando requisição para recusar convite:", conviteId);
-      
-      const response = await httpClient.post(
+      await httpClient.post(
         `/students/me/convites-orientacao/${conviteId}/responder`,
         { "status": "recusado" }
       );
-      
-      console.log("Resposta do servidor:", response.data);
       toast.success("Convite recusado.");
       fetchConvites();
     } catch (error) {
-      console.error("Erro ao recusar convite:", error);
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
-      } else {
-        toast.error("Erro ao recusar convite. Tente novamente.");
-      }
+      toast.error("Erro ao recusar convite.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Enviar convite para professor
+  const handleEnviarConvite = async (e) => {
+    e.preventDefault();
+    if (!selectedProfessorId || !titulo || !descricao) {
+      toast.error("Preencha todos os campos!");
+      return;
+    }
+    try {
+      // Buscar o estudante logado para pegar o estudante_id
+      const estudanteRes = await httpClient.get("/students/me");
+      const estudanteId = estudanteRes.data.id;
+
+      await httpClient.post("/students/me/convites-orientacao", {
+        titulo_proposto: titulo,
+        descricao_proposta: descricao,
+        professor_id: Number(selectedProfessorId),
+        estudante_id: estudanteId // <-- Corrigido: agora envia estudante_id!
+      });
+      toast.success("Convite enviado!");
+      setShowModal(false);
+      setSelectedProfessorId("");
+      setTitulo("");
+      setDescricao("");
+      fetchConvites();
+    } catch {
+      toast.error("Erro ao enviar convite.");
     }
   };
 
@@ -103,43 +135,49 @@ export default function ConvitesAluno() {
       <div className="flex-1 ml-64">
         <div className="min-h-screen bg-gray-100 py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header Section */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="bg-[#2F9E41] bg-opacity-15 p-3 rounded-lg border border-[#2F9E41] border-opacity-20">
-                  <FiMail className="h-8 w-8 text-[#ffffff]" />
-                </div>
-                <div>
+            {/* Header Section com estatísticas e botão à direita */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 flex items-center justify-between">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#2F9E41] bg-opacity-15 p-3 rounded-lg border border-[#2F9E41] border-opacity-20 flex items-center justify-center">
+                    <FiMail className="h-8 w-8 text-[#2F9E41]" />
+                  </div>
                   <h1 className="text-2xl font-bold text-gray-900">Convites de Orientação</h1>
-                  <p className="text-gray-600">Gerencie os convites recebidos de professores para orientação de TCC</p>
+                </div>
+                <p className="text-gray-600">Gerencie os convites recebidos de professores para orientação de TCC</p>
+                {/* Estatísticas dentro do header */}
+                <div className="mt-4 flex gap-6">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-[#2F9E41]">{convites.length}</p>
+                    <p className="text-sm text-gray-600">Total de Convites</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {convites.filter(c => c.status === 'aceito').length}
+                    </p>
+                    <p className="text-sm text-gray-600">Aceitos</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-orange-500">
+                      {convites.filter(c => c.status === 'pendente' || !c.status).length}
+                    </p>
+                    <p className="text-sm text-gray-600">Pendentes</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-red-500">
+                      {convites.filter(c => c.status === 'recusado').length}
+                    </p>
+                    <p className="text-sm text-gray-600">Recusados</p>
+                  </div>
                 </div>
               </div>
-              
-              {/* Estatísticas */}
-              <div className="mt-4 flex gap-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-[#2F9E41]">{convites.length}</p>
-                  <p className="text-sm text-gray-600">Total de Convites</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {convites.filter(c => c.status === 'aceito').length}
-                  </p>
-                  <p className="text-sm text-gray-600">Aceitos</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-500">
-                    {convites.filter(c => c.status === 'pendente' || !c.status).length}
-                  </p>
-                  <p className="text-sm text-gray-600">Pendentes</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-red-500">
-                    {convites.filter(c => c.status === 'recusado').length}
-                  </p>
-                  <p className="text-sm text-gray-600">Recusados</p>
-                </div>
-              </div>
+              {/* Botão para convidar professor - lateral direita */}
+              <button
+                className="bg-[#2F9E41] text-white px-6 py-2 rounded-lg ml-6"
+                onClick={() => setShowModal(true)}
+              >
+                Convidar Professor para Orientação
+              </button>
             </div>
 
             {/* Lista de Convites */}
@@ -191,7 +229,6 @@ export default function ConvitesAluno() {
                             </p>
                           </div>
                         </div>
-                        
                         <div className="flex items-center gap-1 bg-white bg-opacity-30 px-3 py-1 rounded-full border border-white border-opacity-30">
                           {convite.status === "aceito" ? (
                             <FiCheck className="h-4 w-4 text-[#2F9E41] drop-shadow-sm" />
@@ -207,7 +244,6 @@ export default function ConvitesAluno() {
                         </div>
                       </div>
                     </div>
-
                     {/* Card Content */}
                     <div className="p-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -219,12 +255,10 @@ export default function ConvitesAluno() {
                             </div>
                             <h4 className="font-semibold text-gray-900">Proposta de TCC</h4>
                           </div>
-                          
                           <div>
                             <label className="text-sm font-medium text-gray-700">Título Proposto:</label>
                             <p className="text-gray-900 mt-1 font-medium">{convite.titulo_proposto}</p>
                           </div>
-                          
                           <div>
                             <label className="text-sm font-medium text-gray-700">Descrição:</label>
                             <p className="text-gray-600 mt-1 text-sm leading-relaxed">
@@ -232,7 +266,6 @@ export default function ConvitesAluno() {
                             </p>
                           </div>
                         </div>
-
                         {/* Informações do Professor */}
                         <div className="space-y-4">
                           <div className="flex items-center gap-3 mb-3">
@@ -241,25 +274,21 @@ export default function ConvitesAluno() {
                             </div>
                             <h4 className="font-semibold text-gray-900">Informações do Professor</h4>
                           </div>
-                          
                           <div className="space-y-3">
                             <div>
                               <label className="text-sm font-medium text-gray-700">Nome:</label>
                               <p className="text-gray-900 mt-1">{convite.professor?.nome || "Não informado"}</p>
                             </div>
-                            
                             <div>
                               <label className="text-sm font-medium text-gray-700">Email:</label>
                               <p className="text-gray-900 mt-1 break-all">{convite.professor?.email || "Não informado"}</p>
                             </div>
-                            
                             {convite.professor?.departamento && (
                               <div>
                                 <label className="text-sm font-medium text-gray-700">Departamento:</label>
                                 <p className="text-gray-900 mt-1">{convite.professor.departamento}</p>
                               </div>
                             )}
-                            
                             {convite.professor?.telefone && (
                               <div>
                                 <label className="text-sm font-medium text-gray-700">Telefone:</label>
@@ -269,7 +298,6 @@ export default function ConvitesAluno() {
                           </div>
                         </div>
                       </div>
-
                       {/* Actions */}
                       <div className="mt-6 pt-4 border-t border-gray-200">
                         {convite.status === "aceito" ? (
@@ -292,7 +320,6 @@ export default function ConvitesAluno() {
                               <FiX className="h-4 w-4" />
                               Recusar Convite
                             </button>
-                            
                             <button
                               onClick={() => confirmarAceitar(convite.id)}
                               disabled={loading}
@@ -313,6 +340,66 @@ export default function ConvitesAluno() {
         </div>
       </div>
 
+      {/* Modal de convite para professor */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-bold text-[#2F9E41] mb-4">Convidar Professor para Orientação</h3>
+            <form onSubmit={handleEnviarConvite} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Professor:</label>
+                <select
+                  className="w-full border rounded px-2 py-1"
+                  value={selectedProfessorId}
+                  onChange={e => setSelectedProfessorId(e.target.value)}
+                  required
+                >
+                  <option value="">Selecione...</option>
+                  {professores.map(prof => (
+                    <option key={prof.id} value={prof.id}>
+                      {prof.nome} ({prof.departamento})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Título do TCC:</label>
+                <input
+                  className="w-full border rounded px-2 py-1"
+                  value={titulo}
+                  onChange={e => setTitulo(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição:</label>
+                <textarea
+                  className="w-full border rounded px-2 py-1"
+                  value={descricao}
+                  onChange={e => setDescricao(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex gap-2 justify-end mt-4">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#2F9E41] text-white rounded hover:bg-[#217a32]"
+                >
+                  Enviar Convite
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Modal de Confirmação */}
       {confirm.open && (
         <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
@@ -327,18 +414,15 @@ export default function ConvitesAluno() {
                   <FiX className={`h-6 w-6 text-red-600`} />
                 )}
               </div>
-              
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 {confirm.action === "aceitar" ? "Aceitar Convite" : "Recusar Convite"}
               </h3>
-              
               <p className="text-gray-600 mb-6">
                 {confirm.action === "aceitar" 
                   ? "Ao aceitar este convite, você se tornará orientando deste professor e não poderá aceitar outros convites."
                   : "Tem certeza que deseja recusar este convite? Esta ação não pode ser desfeita."
                 }
               </p>
-              
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setConfirm({ open: false, action: null, conviteId: null })}
@@ -346,7 +430,6 @@ export default function ConvitesAluno() {
                 >
                   Cancelar
                 </button>
-                
                 <button
                   onClick={executarConfirmacao}
                   className={`px-4 py-2 text-white rounded-lg font-medium transition-colors ${
