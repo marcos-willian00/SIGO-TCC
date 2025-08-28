@@ -11,7 +11,8 @@ Essa é a versão FrontEnd do **SIGO-TCC**
 O SIGO-TCC (Sistema Integrado de Gestão e Orientação de TCC) visa facilitar a jornada do Trabalho de Conclusão de Curso. Ele oferece um ambiente digital mais organizado e colaborativo, buscando tornar o processo de desenvolvimento do TCC mais simples e produtivo para alunos e orientadores, resultando em uma experiência acadêmica mais fluida.
 
 [BackEnd](https://github.com/VaanToDeev/ApiPrint2) do **SIGO-TCC**
-[Documentação]([https://github.com/VaanToDeev/ApiPrint2](https://github.com/marizzxxxx/SIGOTCC-DOCUMENTOS.git)) do **SIGO-TCC**
+
+[Documentação](https://github.com/marizzxxxx/SIGOTCC-DOCUMENTOS.git) do **SIGO-TCC**
 
 ## 🛠️ Linguagem e ferramentas utilizadas:
 
