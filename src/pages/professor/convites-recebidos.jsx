@@ -37,34 +37,33 @@ export default function ConvitesRecebidosProfessor() {
   };
 
   const handleAceitarConvite = async (conviteId) => {
-    setAceitando(conviteId);
-    try {
-      const token = localStorage.getItem("token");
-      // Aceita o convite e cria o TCC
-      const response = await fetch(
-        `http://localhost:8000/professors/me/convites-orientacao/${conviteId}/aceitar`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        toast.success("Convite aceito e TCC criado!");
-        // Sincronizar Kanban de tarefas (exemplo: pode ser um endpoint ou lógica extra)
-        await sincronizarKanban(conviteId);
-        fetchConvites();
-      } else {
-        toast.error("Erro ao aceitar convite.");
+  setAceitando(conviteId);
+  try {
+    const token = localStorage.getItem("token");
+    // Aceita o convite e cria o TCC
+    const response = await fetch(
+      `http://localhost:8000/professors/convites-orientacao/${conviteId}/aceitar`, // <-- CORRIGIDO
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
-    } catch {
-      toast.error("Erro ao conectar com o servidor.");
-    } finally {
-      setAceitando(null);
+    );
+    if (response.ok) {
+      toast.success("Convite aceito e TCC criado!");
+      await sincronizarKanban(conviteId);
+      fetchConvites();
+    } else {
+      toast.error("Erro ao aceitar convite.");
     }
-  };
+  } catch {
+    toast.error("Erro ao conectar com o servidor.");
+  } finally {
+    setAceitando(null);
+  }
+};
 
   // Exemplo de função para sincronizar Kanban (ajuste conforme seu backend)
   const sincronizarKanban = async (conviteId) => {

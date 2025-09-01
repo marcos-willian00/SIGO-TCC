@@ -19,8 +19,12 @@ export const loginService = async (email, password) => {
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);
 
-    // Buscar dados do usuário autenticado
-    const userResponse = await httpClient.get('/auth/me');
+    // Buscar dados do usuário autenticado, enviando o token no header!
+    const userResponse = await httpClient.get('/auth/me', {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
     const user = userResponse.data;
     console.log('Usuário retornado:', user);
 
@@ -33,7 +37,7 @@ export const loginService = async (email, password) => {
     localStorage.setItem('nome', user.nome);
     localStorage.setItem('user_type', user.user_type);
 
-    return { success: true, user };
+    return { success: true, user, token: access_token };
   } catch (error) {
     console.error('Erro no loginService:', error);
 

@@ -25,7 +25,7 @@ export default function MainpageProfessor() {
           }, 500);
           return;
         }
-
+      
         const response = await fetch("http://localhost:8000/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });

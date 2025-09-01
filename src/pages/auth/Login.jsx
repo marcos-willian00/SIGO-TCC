@@ -56,9 +56,13 @@ function Login() {
       return;
     }
 
-    if (tipo === 'estudante') {
-      navigate('/aluno');
-    } else if (tipo === 'professor') {
+    // Salva o token (se ainda não faz isso)
+    localStorage.setItem("token", loginResponse.token);
+
+    // Se for professor, salva o id no localStorage
+    if (tipo === 'professor') {
+      localStorage.setItem("professor_id", user.id);
+
       if (role === 'admin') {
         navigate('/admin');
       } else if (role === 'coordenador') {
@@ -66,6 +70,8 @@ function Login() {
       } else {
         navigate('/professor');
       }
+    } else if (tipo === 'estudante') {
+      navigate('/aluno');
     } else {
       toast('Tipo de usuário desconhecido.', { type: 'error' });
       return;
