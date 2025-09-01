@@ -26,6 +26,34 @@ export default function OrientadosProfessor() {
   const [tituloProposto, setTituloProposto] = useState("");
   const [descricaoProposta, setDescricaoProposta] = useState("");
   const [expandedOrientando, setExpandedOrientando] = useState(null);
+  const [dropdownStatus, setDropdownStatus] = useState(null);
+    const handleAtualizarStatusTCC = async (tccId, novoStatus) => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:8000/professors/tccs/${tccId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ status: novoStatus }),
+          }
+        );
+        if (response.ok) {
+          toast.success("Status do TCC atualizado!");
+          fetchOrientandos();
+        } else {
+          toast.error("Erro ao atualizar status do TCC.");
+        }
+      } catch {
+        toast.error("Erro ao conectar com o servidor.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   useEffect(() => {
     fetchOrientandos();
@@ -66,14 +94,14 @@ export default function OrientadosProfessor() {
 
   // Função para obter cor do status
   const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "em_andamento":
+    switch (status) {
+      case "EM_ANDAMENTO":
         return "bg-green-100 text-green-800 border-green-200";
-      case "finalizado":
+      case "FINALIZADO":
         return "bg-green-100 text-green-800 border-green-200";
-      case "suspenso":
+      case "SUSPENSO":
         return "bg-red-100 text-red-800 border-red-200";
-      case "concluido":
+      case "CONCLUIDO":
         return "bg-green-100 text-green-800 border-green-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
@@ -82,14 +110,14 @@ export default function OrientadosProfessor() {
 
   // Função para obter texto do status
   const getStatusText = (status) => {
-    switch (status?.toLowerCase()) {
-      case "em_andamento":
+    switch (status) {
+      case "EM_ANDAMENTO":
         return "Em Andamento";
-      case "finalizado":
+      case "FINALIZADO":
         return "Finalizado";
-      case "suspenso":
+      case "SUSPENSO":
         return "Suspenso";
-      case "concluido":
+      case "CONCLUIDO":
         return "Concluído";
       default:
         return "Em Andamento";
@@ -201,13 +229,13 @@ export default function OrientadosProfessor() {
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-[#2F9E41]">
-                      {orientandos.filter(o => o.tcc && o.tcc.status === 'concluido').length}
+                      {orientandos.filter(o => o.tcc && o.tcc.status === 'CONCLUIDO').length}
                     </p>
                     <p className="text-sm text-gray-600">Concluídos</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-[#2F9E41]">
-                      {orientandos.filter(o => o.tcc && o.tcc.status === 'em_andamento').length}
+                      {orientandos.filter(o => o.tcc && o.tcc.status === 'EM_ANDAMENTO').length}
                     </p>
                     <p className="text-sm text-gray-600">Em Andamento</p>
                   </div>
@@ -299,7 +327,7 @@ export default function OrientadosProfessor() {
 
                     {/* Detalhes Expandidos */}
                     {expandedOrientando === orientando.id && (
-                      <div className="border-t border-gray-200 bg-gray-50">
+                      <div className="border-t border-gray-200 bg-gray-50" style={{overflowY: 'auto', maxHeight: '400px', position: 'relative'}}>
                         <div className="p-6">
                           {orientando.tcc ? (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -328,6 +356,33 @@ export default function OrientadosProfessor() {
                                     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(orientando.tcc.status)}`}>
                                       {getStatusText(orientando.tcc.status)}
                                     </span>
+                                      <div className="relative mt-2">
+                                        <button
+                                          className="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded border border-gray-300 hover:bg-gray-200"
+                                          onClick={() => setDropdownStatus(orientando.tcc.id)}
+                                          disabled={loading}
+                                        >Alterar Status</button>
+                                        {dropdownStatus === orientando.tcc.id && (
+                                          <div className="absolute z-50 mt-2 bg-white border border-gray-200 rounded shadow-lg w-40" style={{overflow: 'visible'}}>
+                                            <button
+                                              className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-100"
+                                              onClick={() => { handleAtualizarStatusTCC(orientando.tcc.id, "EM_ANDAMENTO"); setDropdownStatus(null); }}
+                                              disabled={orientando.tcc.status === "EM_ANDAMENTO"}
+                                            >Em Andamento</button>
+                                            <button
+                                              className="block w-full text-left px-4 py-2 text-sm hover:bg-purple-100"
+                                              onClick={() => { handleAtualizarStatusTCC(orientando.tcc.id, "CONCLUIDO"); setDropdownStatus(null); }}
+                                              disabled={orientando.tcc.status === "CONCLUIDO"}
+                                            >Concluído</button>
+                                            <button
+                                              className="block w-full text-left px-4 py-2 text-sm hover:bg-red-100"
+                                              onClick={() => { handleAtualizarStatusTCC(orientando.tcc.id, "SUSPENSO"); setDropdownStatus(null); }}
+                                              disabled={orientando.tcc.status === "SUSPENSO"}
+                                            >Suspenso</button>
+                                          </div>
+                                        )}
+                                      </div>
+ 
                                   </div>
                                 </div>
                               </div>

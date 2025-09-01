@@ -30,6 +30,29 @@ export default function OrientadosProfessor() {
   const [descricaoProposta, setDescricaoProposta] = useState("");
   const [expandedOrientando, setExpandedOrientando] = useState(null);
 
+    // Atualizar status do TCC
+    const handleAtualizarStatusTCC = async (tccId, novoStatus) => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(`http://localhost:8000/professors/tccs/${tccId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: novoStatus }),
+        });
+        if (response.ok) {
+          toast.success("Status do TCC atualizado!");
+          fetchOrientandos();
+        } else {
+          const data = await response.json();
+          toast.error(data.detail || "Erro ao atualizar status.");
+        }
+      } catch {
+        toast.error("Erro ao conectar com o servidor.");
+      }
+    };
   useEffect(() => {
     fetchOrientandos();
   }, []);
@@ -191,7 +214,7 @@ export default function OrientadosProfessor() {
                     <FiUsers className="h-8 w-8 text-indigo-600" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Meus Orientandos</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Meus Orientandosl</h1>
                     <p className="text-gray-600">Gerencie seus alunos orientandos e seus projetos de TCC</p>
                   </div>
                 </div>
@@ -348,6 +371,28 @@ export default function OrientadosProfessor() {
                                     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(orientando.tcc.status)}`}>
                                       {getStatusText(orientando.tcc.status)}
                                     </span>
+                                      <div className="flex gap-2 mt-2">
+                                        <button
+                                          onClick={() => handleAtualizarStatusTCC(orientando.tcc.id, "em_andamento")}
+                                          className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded border border-blue-200 hover:bg-blue-200"
+                                          disabled={orientando.tcc.status === "em_andamento"}
+                                        >Em Andamento</button>
+                                        <button
+                                          onClick={() => handleAtualizarStatusTCC(orientando.tcc.id, "concluido")}
+                                          className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded border border-purple-200 hover:bg-purple-200"
+                                          disabled={orientando.tcc.status === "concluido"}
+                                        >Concluído</button>
+                                        <button
+                                          onClick={() => handleAtualizarStatusTCC(orientando.tcc.id, "finalizado")}
+                                          className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded border border-green-200 hover:bg-green-200"
+                                          disabled={orientando.tcc.status === "finalizado"}
+                                        >Finalizado</button>
+                                        <button
+                                          onClick={() => handleAtualizarStatusTCC(orientando.tcc.id, "suspenso")}
+                                          className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded border border-red-200 hover:bg-red-200"
+                                          disabled={orientando.tcc.status === "suspenso"}
+                                        >Suspenso</button>
+                                      </div>
                                   </div>
                                 </div>
                               </div>
