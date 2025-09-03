@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import CoordenadorMenu from "./menu-coordenador";
 import { FiUser, FiArchive, FiRefreshCw, FiSearch, FiUserCheck } from "react-icons/fi";
 
 export default function GerenciarAlunosCoordenador() {
+  const [modal, setModal] = useState({ open: false, tipo: null, alunoId: null, nome: "" });
   const [alunos, setAlunos] = useState([]);
   const [alunosArquivados, setAlunosArquivados] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -59,55 +61,44 @@ export default function GerenciarAlunosCoordenador() {
 
   // Arquivar aluno
   const handleArquivarAluno = async (alunoId, nomeAluno) => {
-    if (!window.confirm(`Tem certeza que deseja arquivar o aluno ${nomeAluno}? Ele não conseguirá mais fazer login.`)) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8000/admin/estudantes/${alunoId}/arquivar`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        toast.success("Aluno arquivado com sucesso!");
-        fetchAlunos();
-        fetchAlunosArquivados();
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.detail || "Erro ao arquivar aluno.");
-      }
-    } catch (error) {
-      toast.error("Erro ao conectar com o servidor.");
-    }
+    setModal({ open: true, tipo: "arquivar", alunoId, nome: nomeAluno });
   };
 
   // Desarquivar aluno
   const handleDesarquivarAluno = async (alunoId, nomeAluno) => {
-    if (!window.confirm(`Tem certeza que deseja desarquivar o aluno ${nomeAluno}? Ele poderá fazer login novamente.`)) {
-      return;
-    }
-
+    setModal({ open: true, tipo: "desarquivar", alunoId, nome: nomeAluno });
+  };
+  // Função para confirmar ação do modal
+  const confirmarModal = async () => {
+    if (!modal.open) return;
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8000/admin/estudantes/${alunoId}/desarquivar`, {
+      let url = "";
+      if (modal.tipo === "arquivar") {
+        url = `http://localhost:8000/admin/estudantes/${modal.alunoId}/arquivar`;
+      } else {
+        url = `http://localhost:8000/admin/estudantes/${modal.alunoId}/desarquivar`;
+      }
+      const response = await fetch(url, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (response.ok) {
-        toast.success("Aluno desarquivado com sucesso!");
+        toast.success(modal.tipo === "arquivar" ? "Aluno arquivado com sucesso!" : "Aluno desarquivado com sucesso!");
         fetchAlunos();
         fetchAlunosArquivados();
       } else {
         const errorData = await response.json();
-        toast.error(errorData.detail || "Erro ao desarquivar aluno.");
+        toast.error(errorData.detail || (modal.tipo === "arquivar" ? "Erro ao arquivar aluno." : "Erro ao desarquivar aluno."));
       }
     } catch (error) {
       toast.error("Erro ao conectar com o servidor.");
     }
+    setModal({ open: false, tipo: null, alunoId: null, nome: "" });
   };
+
+  // Função para fechar modal
+  const fecharModal = () => setModal({ open: false, tipo: null, alunoId: null, nome: "" });
 
   // Filtrar alunos por busca
   const alunosFiltrados = (showArquivados ? alunosArquivados : alunos).filter(
@@ -286,6 +277,37 @@ export default function GerenciarAlunosCoordenador() {
             </div>
           </div>
         </div>
+
+        {/* Modal de confirmação */}
+        {modal.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{background: "rgba(255,255,255,0.6)"}}>
+            <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md border border-gray-200 animate-fadeIn">
+              <h2 className="text-xl font-bold mb-4 text-gray-900 flex items-center gap-2">
+                {modal.tipo === "arquivar" ? <FiArchive className="text-orange-500" /> : <FiUserCheck className="text-green-600" />}
+                {modal.tipo === "arquivar" ? "Arquivar Aluno" : "Desarquivar Aluno"}
+              </h2>
+              <p className="mb-6 text-gray-700 text-base">
+                {modal.tipo === "arquivar"
+                  ? `Tem certeza que deseja arquivar o aluno "${modal.nome}"? Ele não conseguirá mais fazer login.`
+                  : `Tem certeza que deseja desarquivar o aluno "${modal.nome}"? Ele poderá fazer login novamente.`}
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={fecharModal}
+                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmarModal}
+                  className={`px-4 py-2 rounded-lg font-semibold shadow transition ${modal.tipo === "arquivar" ? "bg-orange-500 hover:bg-orange-600 text-white" : "bg-green-600 hover:bg-green-700 text-white"}`}
+                >
+                  {modal.tipo === "arquivar" ? "Arquivar" : "Desarquivar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <ToastContainer />
     </div>

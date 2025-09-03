@@ -145,7 +145,7 @@ export default function KanbanAluno() {
       <AlunoMenu />
       <div className="flex-1 ml-64 px-4 py-8 overflow-x-hidden">
         <h2 className="text-2xl font-bold text-[#2F9E41] mb-6 text-center drop-shadow">
-          Meu Kanban de Tarefas
+          Meu Quadro de Tarefas
         </h2>
         <button
           className="bg-[#2F9E41] text-white px-4 py-2 rounded-lg mb-4"

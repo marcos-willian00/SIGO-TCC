@@ -111,21 +111,21 @@ export default function ConvitesRecebidosProfessor() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+  <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-white">
       <ProfessorMenu />
       <div className="flex-1 ml-64">
         <div className="max-w-4xl mx-auto py-10 px-4">
           <h1 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-            <FiMail className="text-indigo-600" /> Convites Recebidos
+            <FiMail className="text-green-600" /> Convites Recebidos
           </h1>
           {loading ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
               <p className="mt-2 text-gray-600">Carregando convites...</p>
             </div>
           ) : convites.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
-              <FiMail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <FiMail className="h-12 w-12 text-green-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum convite recebido</h3>
               <p className="text-gray-600">Você ainda não recebeu convites de orientação de alunos.</p>
             </div>
@@ -135,8 +135,8 @@ export default function ConvitesRecebidosProfessor() {
                 <div key={convite.id} className="bg-white rounded-lg shadow border border-gray-200 p-6 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <FiUser className="h-6 w-6 text-indigo-600" />
-                      <span className="font-semibold text-gray-900">{convite.estudante?.nome || "Aluno"}</span>
+                      <FiUser className="h-6 w-6 text-green-600" />
+                      <span className="font-semibold text-green-900">{convite.estudante?.nome || "Aluno"}</span>
                       <span className="text-sm text-gray-600">{convite.estudante?.email}</span>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(convite.status)}`}>
